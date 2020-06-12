@@ -1,5 +1,6 @@
 package com.example.finebody.repository;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -48,6 +49,7 @@ public class Repository {
         cursor = db.query(Student.TABLE_NAME, null, null, null, null, null, null);
 
         if(cursor != null) cursor.moveToFirst();
+        db.close();
         return cursor;
     }
 
@@ -62,10 +64,40 @@ public class Repository {
         cursor = db.query(Measure.TABLE_NAME, null, whereClause, whereArgs, null, null, Measure.COLUMN_DATE);
 
         if(cursor != null) cursor.moveToFirst();
+        db.close();
         return cursor;
     }
 
-    //saveStudent
+    //insertStudent
+    public long insertStudent(Student student){
+
+        long newId;
+        SQLiteDatabase db = db_sqlite.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(Student.COLUMN_NAME, student.getName());
+        values.put(Student.COLUMN_GENRE, student.getGenre());
+        values.put(Student.COLUMN_AGE, student.getAge());
+        values.put(Student.COLUMN_PATH_PHOTO, student.getPath_photo());
+        values.put(Student.COLUMN_PATH_PHOTO1, "");
+        values.put(Student.COLUMN_PATH_PHOTO2, "");
+        values.put(Student.COLUMN_PATH_PHOTO3, "");
+        values.put(Student.COLUMN_PATH_PHOTO4, "");
+        values.put(Student.COLUMN_PATH_PHOTO5, "");
+        values.put(Student.COLUMN_PATH_PHOTO6, "");
+        values.put(Student.COLUMN_PATH_PHOTO7, "");
+        values.put(Student.COLUMN_PATH_PHOTO8, "");
+        values.put(Student.COLUMN_PATH_PHOTO9, "");
+        values.put(Student.COLUMN_PATH_PHOTO10, "");
+
+        newId = db.insert(Student.TABLE_NAME, null, values);
+        db.close();
+
+        //Insert in firebase <-------------------------------------------------------------------------------
+
+        return newId;
+    }
+
     //updateStudent
     //deleteStudent
 
