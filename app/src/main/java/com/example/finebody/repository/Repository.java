@@ -73,32 +73,34 @@ public class Repository {
 
         long newId;
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(Student.COLUMN_NAME, student.getName());
-        values.put(Student.COLUMN_GENRE, student.getGenre());
-        values.put(Student.COLUMN_AGE, student.getAge());
-        values.put(Student.COLUMN_PATH_PHOTO, student.getPath_photo());
-        values.put(Student.COLUMN_PATH_PHOTO1, "");
-        values.put(Student.COLUMN_PATH_PHOTO2, "");
-        values.put(Student.COLUMN_PATH_PHOTO3, "");
-        values.put(Student.COLUMN_PATH_PHOTO4, "");
-        values.put(Student.COLUMN_PATH_PHOTO5, "");
-        values.put(Student.COLUMN_PATH_PHOTO6, "");
-        values.put(Student.COLUMN_PATH_PHOTO7, "");
-        values.put(Student.COLUMN_PATH_PHOTO8, "");
-        values.put(Student.COLUMN_PATH_PHOTO9, "");
-        values.put(Student.COLUMN_PATH_PHOTO10, "");
-
-        newId = db.insert(Student.TABLE_NAME, null, values);
+        newId = db.insert(Student.TABLE_NAME, null, getValuesStudent(student));
         db.close();
 
-        //Insert in firebase <-------------------------------------------------------------------------------
+        if(newId  != -1){
+
+            //Insert in firebase <-------------------------------------------------------------------------------
+        }
 
         return newId;
     }
 
     //updateStudent
+    public boolean updateStudent(Student student){
+
+        SQLiteDatabase db = db_sqlite.getWritableDatabase();
+        String whereClause = Student._ID + " = ?";
+        String[] whereArgs = {Integer.toString(student.getId())};
+        if(db.update(Student.TABLE_NAME, getValuesStudent(student), whereClause, whereArgs) == 0) {
+
+            db.close();
+            return false;
+        }
+        db.close();
+
+        //Update in firebase <-------------------------------------------------------------------------------
+
+        return true;
+    }
     //deleteStudent
 
     //saveMeasure
@@ -117,5 +119,27 @@ public class Repository {
     public static List<Measure> getMeasuresFirebase(){
 
         return null;
+    }
+
+    private ContentValues getValuesStudent(Student student){
+
+        ContentValues values = new ContentValues();
+        values.put(Student.COLUMN_NAME, student.getName());
+        values.put(Student.COLUMN_GENRE, student.getGenre());
+        values.put(Student.COLUMN_AGE, student.getAge());
+        values.put(Student.COLUMN_PATH_PHOTO, student.getPath_photo());
+        values.put(Student.COLUMN_PATH_PHOTO1, student.getPath_photo1());
+        values.put(Student.COLUMN_PATH_PHOTO2, student.getPath_photo2());
+        values.put(Student.COLUMN_PATH_PHOTO3, student.getPath_photo3());
+        values.put(Student.COLUMN_PATH_PHOTO4, student.getPath_photo4());
+        values.put(Student.COLUMN_PATH_PHOTO5, student.getPath_photo5());
+        values.put(Student.COLUMN_PATH_PHOTO6, student.getPath_photo6());
+        values.put(Student.COLUMN_PATH_PHOTO7, student.getPath_photo7());
+        values.put(Student.COLUMN_PATH_PHOTO8, student.getPath_photo8());
+        values.put(Student.COLUMN_PATH_PHOTO9, student.getPath_photo9());
+        values.put(Student.COLUMN_PATH_PHOTO10, student.getPath_photo10());
+        values.put(Student.COLUMN_ID_COACH, student.getId_coach());
+
+        return values;
     }
 }
