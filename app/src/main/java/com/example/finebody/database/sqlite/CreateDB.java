@@ -9,7 +9,7 @@ import com.example.finebody.database.sqlite.entitys.Student;
 
 public class CreateDB extends SQLiteOpenHelper {
 
-    private static final String DB_NAME = "finebody.db";
+    public static final String DB_NAME = "finebody.db";
     private static final int DB_VERSION = 1;
 
     public CreateDB(Context context){

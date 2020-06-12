@@ -4,6 +4,17 @@ import android.provider.BaseColumns;
 
 public class Measure implements BaseColumns {
 
+    private int id;
+    private String date;
+    private float weight;
+    private float right_arm;
+    private float left_arm;
+    private float waist;
+    private float hip;
+    private float right_calf;
+    private float left_calf;
+    private int id_student;
+
     public static final String TABLE_NAME = "measures";
 
     public static final String COLUMN_DATE = "date";
@@ -33,4 +44,84 @@ public class Measure implements BaseColumns {
 
     //Query delete table Measure
     public static final String SQL_DELETE_TABLE_MEASURE = "DROP TABLE IF EXISTS " + Measure.TABLE_NAME;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public float getWeight() {
+        return weight;
+    }
+
+    public void setWeight(float weight) {
+        this.weight = weight;
+    }
+
+    public float getRight_arm() {
+        return right_arm;
+    }
+
+    public void setRight_arm(float right_arm) {
+        this.right_arm = right_arm;
+    }
+
+    public float getLeft_arm() {
+        return left_arm;
+    }
+
+    public void setLeft_arm(float left_arm) {
+        this.left_arm = left_arm;
+    }
+
+    public float getWaist() {
+        return waist;
+    }
+
+    public void setWaist(float waist) {
+        this.waist = waist;
+    }
+
+    public float getHip() {
+        return hip;
+    }
+
+    public void setHip(float hip) {
+        this.hip = hip;
+    }
+
+    public float getRight_calf() {
+        return right_calf;
+    }
+
+    public void setRight_calf(float right_calf) {
+        this.right_calf = right_calf;
+    }
+
+    public float getLeft_calf() {
+        return left_calf;
+    }
+
+    public void setLeft_calf(float left_calf) {
+        this.left_calf = left_calf;
+    }
+
+    public int getId_student() {
+        return id_student;
+    }
+
+    public void setId_student(int id_student) {
+        this.id_student = id_student;
+    }
 }
