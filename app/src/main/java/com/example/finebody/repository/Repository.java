@@ -101,7 +101,24 @@ public class Repository {
 
         return true;
     }
+
     //deleteStudent
+    public boolean deleteStudent(Student student){
+
+        SQLiteDatabase db = db_sqlite.getWritableDatabase();
+        String whereClause = Student._ID + " = ?";
+        String[] whereArgs = {Integer.toString(student.getId())};
+        if(db.delete(Student.TABLE_NAME, whereClause, whereArgs) == 0) {
+
+            db.close();
+            return false;
+        }
+        db.close();
+
+        //Delete in firebase <-------------------------------------------------------------------------------
+
+        return true;
+    }
 
     //saveMeasure
     //updateMeasure
