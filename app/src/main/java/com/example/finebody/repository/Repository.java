@@ -121,6 +121,21 @@ public class Repository {
     }
 
     //saveMeasure
+    public long insertMeasure(Measure measure){
+
+        long newId;
+        SQLiteDatabase db = db_sqlite.getWritableDatabase();
+        newId = db.insert(Measure.TABLE_NAME, null, getValuesMeasure(measure));
+        db.close();
+
+        if(newId != -1){
+
+            //Insert in firebase
+        }
+
+        return newId;
+
+    }
     //updateMeasure
     //deleteMeasure
 
@@ -156,6 +171,22 @@ public class Repository {
         values.put(Student.COLUMN_PATH_PHOTO9, student.getPath_photo9());
         values.put(Student.COLUMN_PATH_PHOTO10, student.getPath_photo10());
         values.put(Student.COLUMN_ID_COACH, student.getId_coach());
+
+        return values;
+    }
+
+    private ContentValues getValuesMeasure(Measure measure){
+
+        ContentValues values = new ContentValues();
+        values.put(Measure.COLUMN_DATE, measure.getDate());
+        values.put(Measure.COLUMN_WEIGHT, measure.getWeight());
+        values.put(Measure.COLUMN_RIGHT_ARM, measure.getRight_arm());
+        values.put(Measure.COLUMN_LEFT_ARM, measure.getLeft_arm());
+        values.put(Measure.COLUMN_WAIST, measure.getWaist());
+        values.put(Measure.COLUMN_HIP, measure.getHip());
+        values.put(Measure.COLUMN_RIGHT_CALF, measure.getRight_calf());
+        values.put(Measure.COLUMN_LEFT_CALF, measure.getLeft_calf());
+        values.put(Measure.COLUMN_ID_STUDENT, measure.getId_student());
 
         return values;
     }
