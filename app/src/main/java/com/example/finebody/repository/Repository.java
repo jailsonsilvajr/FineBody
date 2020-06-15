@@ -136,7 +136,19 @@ public class Repository {
         return newId;
 
     }
+
     //updateMeasure
+    public boolean updateMeasure(Measure measure){
+
+        SQLiteDatabase db = db_sqlite.getWritableDatabase();
+        String whereClause = Measure._ID + " = ?";
+        String[] whereArgs = {Integer.toString(measure.getId())};
+        int result = db.update(Measure.TABLE_NAME, getValuesMeasure(measure), whereClause, whereArgs);
+        db.close();
+
+        if(result == 0) return false;
+        return true;
+    }
     //deleteMeasure
 
     //getSharedPreferences(id_coach)
