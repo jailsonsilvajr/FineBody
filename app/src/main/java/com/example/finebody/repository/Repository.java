@@ -2,6 +2,7 @@ package com.example.finebody.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -15,7 +16,10 @@ import java.util.List;
 public class Repository {
 
     private static Repository repository;
+    private static SharedPreferences preferences;
     private static CreateDB db_sqlite;
+
+    private static final String key_idCoach = "idCoach";
 
     private Repository(){}
 
@@ -24,7 +28,7 @@ public class Repository {
         if(repository == null){
 
             repository = new Repository();
-
+            preferences = context.getSharedPreferences("key_idCoach", Context.MODE_PRIVATE);
             File dbFile = context.getDatabasePath(CreateDB.DB_NAME);
             if(dbFile.exists()){
 
@@ -167,9 +171,26 @@ public class Repository {
         return true;
     }
 
-    //getSharedPreferences(id_coach)
-    //saveSharedPreferences(id_coach)
-    //deleteSharedPreferences(id_coach)
+    //set id Coach in preferences
+    public void setIdCoach(long id_coach){
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong("key_idCoach", id_coach);
+        editor.apply();
+    }
+
+    //get id Coach in preferences
+    public long getIdCoach(){
+
+        return preferences.getLong(key_idCoach, 0);
+    }
+
+    //delete id Coach in preferences
+    public void deleteIdCoach(){
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove(key_idCoach);
+    }
 
     public static List<Student> getStudentsFirebase(int id_coach){
 
