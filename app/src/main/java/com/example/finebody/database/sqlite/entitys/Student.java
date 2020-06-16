@@ -4,7 +4,7 @@ import android.provider.BaseColumns;
 
 public class Student implements BaseColumns {
 
-    private int id;
+    private long id;
     private String name;
     private String genre;
     private int age;
@@ -63,11 +63,11 @@ public class Student implements BaseColumns {
     public static final String SQL_DELETE_TABLE_STUDENT =
             "DROP TABLE IF EXISTS " + Student.TABLE_NAME;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 

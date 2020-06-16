@@ -4,7 +4,7 @@ import android.provider.BaseColumns;
 
 public class Measure implements BaseColumns {
 
-    private int id;
+    private long id;
     private String date;
     private float weight;
     private float right_arm;
@@ -13,7 +13,7 @@ public class Measure implements BaseColumns {
     private float hip;
     private float right_calf;
     private float left_calf;
-    private int id_student;
+    private long id_student;
 
     public static final String TABLE_NAME = "measures";
 
@@ -45,11 +45,11 @@ public class Measure implements BaseColumns {
     //Query delete table Measure
     public static final String SQL_DELETE_TABLE_MEASURE = "DROP TABLE IF EXISTS " + Measure.TABLE_NAME;
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -117,11 +117,11 @@ public class Measure implements BaseColumns {
         this.left_calf = left_calf;
     }
 
-    public int getId_student() {
+    public long getId_student() {
         return id_student;
     }
 
-    public void setId_student(int id_student) {
+    public void setId_student(long id_student) {
         this.id_student = id_student;
     }
 }

@@ -33,7 +33,7 @@ public class Repository {
 
                 //List<Student> listStudents = getStudentsFirebase(id_coach);
                 //List<Measure> listMeasures = getMeasuresFirebase();
-                //db_sqlite = new CreateDB(context);
+                db_sqlite = new CreateDB(context);
                 //povoar database sqlite
             }
         }
@@ -89,7 +89,7 @@ public class Repository {
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Student._ID + " = ?";
-        String[] whereArgs = {Integer.toString(student.getId())};
+        String[] whereArgs = {Long.toString(student.getId())};
         if(db.update(Student.TABLE_NAME, getValuesStudent(student), whereClause, whereArgs) == 0) {
 
             db.close();
@@ -107,7 +107,7 @@ public class Repository {
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Student._ID + " = ?";
-        String[] whereArgs = {Integer.toString(student.getId())};
+        String[] whereArgs = {Long.toString(student.getId())};
         if(db.delete(Student.TABLE_NAME, whereClause, whereArgs) == 0) {
 
             db.close();
@@ -142,7 +142,7 @@ public class Repository {
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Measure._ID + " = ?";
-        String[] whereArgs = {Integer.toString(measure.getId())};
+        String[] whereArgs = {Long.toString(measure.getId())};
         int result = db.update(Measure.TABLE_NAME, getValuesMeasure(measure), whereClause, whereArgs);
         db.close();
 
@@ -157,7 +157,7 @@ public class Repository {
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Measure._ID + " = ?";
-        String[] whereArgs = {Integer.toString(measure.getId())};
+        String[] whereArgs = {Long.toString(measure.getId())};
         int result = db.delete(Measure.TABLE_NAME, whereClause, whereArgs);
         db.close();
 
