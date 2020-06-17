@@ -1,4 +1,4 @@
-package com.example.finebody.repository;
+package com.jjsj.finebodyapp.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,9 +6,9 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.finebody.database.sqlite.CreateDB;
-import com.example.finebody.database.sqlite.entitys.Measure;
-import com.example.finebody.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.database.sqlite.CreateDB;
+import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
+import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 
 import java.io.File;
 import java.util.List;

@@ -1,9 +1,9 @@
-package com.example.finebody.views;
+package com.jjsj.finebodyapp.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import com.example.finebody.R;
-import com.example.finebody.repository.TestRepository;
+import com.jjsj.finebodyapp.R;
+import com.jjsj.finebodyapp.repository.TestRepository;
 
 public class MainActivity extends AppCompatActivity {
 

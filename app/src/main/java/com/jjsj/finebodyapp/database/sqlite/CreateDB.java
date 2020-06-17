@@ -1,11 +1,11 @@
-package com.example.finebody.database.sqlite;
+package com.jjsj.finebodyapp.database.sqlite;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.finebody.database.sqlite.entitys.Measure;
-import com.example.finebody.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
+import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 
 public class CreateDB extends SQLiteOpenHelper {
 

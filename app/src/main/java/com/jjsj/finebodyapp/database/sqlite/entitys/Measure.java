@@ -1,4 +1,4 @@
-package com.example.finebody.database.sqlite.entitys;
+package com.jjsj.finebodyapp.database.sqlite.entitys;
 
 import android.provider.BaseColumns;
 
