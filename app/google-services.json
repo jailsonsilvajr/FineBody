@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "635020723967",
+    "firebase_url": "https://finebody-a72dc.firebaseio.com",
+    "project_id": "finebody-a72dc",
+    "storage_bucket": "finebody-a72dc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:635020723967:android:2b5c43fa6479d158942eca",
+        "android_client_info": {
+          "package_name": "com.jjsj.finebodyapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "635020723967-22usp4es6k2dkqo2hqus5tvr0lmi0n58.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jjsj.finebodyapp",
+            "certificate_hash": "359474aea6abbddd64d71ec11391777ae65080a6"
+          }
+        },
+        {
+          "client_id": "635020723967-k2mr03b6i89l9c48bh1032po616b2ptp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYu8wJwxggr9GRmJ-zDzI7N408HfFkJeQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "635020723967-k2mr03b6i89l9c48bh1032po616b2ptp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
