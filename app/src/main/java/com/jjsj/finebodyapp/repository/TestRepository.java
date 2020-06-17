@@ -94,7 +94,7 @@ public class TestRepository {
         student.setPath_photo8("");
         student.setPath_photo9("");
         student.setPath_photo10("");
-        student.setId_coach(1);
+        student.setId_coach("1");
     }
 
     public void setMeasure(Measure measure, long idStudent){

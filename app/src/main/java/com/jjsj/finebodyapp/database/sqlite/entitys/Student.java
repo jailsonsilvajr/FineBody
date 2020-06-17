@@ -19,7 +19,7 @@ public class Student implements BaseColumns {
     private String path_photo8;
     private String path_photo9;
     private String path_photo10;
-    private int id_coach;
+    private String id_coach;
 
     public static final String TABLE_NAME = "student";
 
@@ -57,7 +57,7 @@ public class Student implements BaseColumns {
                     Student.COLUMN_PATH_PHOTO8 + " TEXT," +
                     Student.COLUMN_PATH_PHOTO9 + " TEXT," +
                     Student.COLUMN_PATH_PHOTO10 + " TEXT," +
-                    Student.COLUMN_ID_COACH + " INTEGER)";
+                    Student.COLUMN_ID_COACH + " TEXT)";
 
     //Query delete table:
     public static final String SQL_DELETE_TABLE_STUDENT =
@@ -183,11 +183,11 @@ public class Student implements BaseColumns {
         this.path_photo10 = path_photo10;
     }
 
-    public int getId_coach() {
+    public String getId_coach() {
         return id_coach;
     }
 
-    public void setId_coach(int id_coach) {
+    public void setId_coach(String id_coach) {
         this.id_coach = id_coach;
     }
 }
