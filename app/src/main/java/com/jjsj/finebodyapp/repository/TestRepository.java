@@ -12,7 +12,7 @@ public class TestRepository {
     public TestRepository(Context context){
 
         context.deleteDatabase(CreateDB.DB_NAME);//delete database if exists
-        Repository repository = Repository.getInstance(context, 1);//create database
+        Repository repository = Repository.getInstance(context);//create database
 
         //insert student:
         Student student = new Student();

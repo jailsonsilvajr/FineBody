@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">FineBody</string>
+
+    <string name="email">Email</string>
+    <string name="password">Senha</string>
+    <string name="enter">Entrar</string>
+    <string name="register">Cadastrar</string>
+    <string name="TitleAlertEmailOrPasswordInvalid">Ops!</string>
+    <string name="MessageAlertEmailOrPasswordInvalid">Email ou senha inválidos</string>
+    <string name="TitleAlertLoginFail">Tente novamente</string>
+    <string name="MessageAlertLoginFail">Email ou senha errados</string>
 </resources>

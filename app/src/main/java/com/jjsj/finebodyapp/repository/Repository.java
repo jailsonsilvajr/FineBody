@@ -6,6 +6,14 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+
 import com.jjsj.finebodyapp.database.sqlite.CreateDB;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
@@ -23,7 +31,7 @@ public class Repository {
 
     private Repository(){}
 
-    public static Repository getInstance(Context context, int id_coach){
+    public static Repository getInstance(Context context){
 
         if(repository == null){
 
@@ -172,17 +180,17 @@ public class Repository {
     }
 
     //set id Coach in preferences
-    public void setIdCoach(long id_coach){
+    public void setIdCoach(String id_coach){
 
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong("key_idCoach", id_coach);
+        editor.putString("key_idCoach", id_coach);
         editor.apply();
     }
 
     //get id Coach in preferences
-    public long getIdCoach(){
+    public String getIdCoach(){
 
-        return preferences.getLong(key_idCoach, 0);
+        return preferences.getString(key_idCoach, null);
     }
 
     //delete id Coach in preferences
@@ -190,6 +198,42 @@ public class Repository {
 
         SharedPreferences.Editor editor = preferences.edit();
         editor.remove(key_idCoach);
+    }
+
+    public MutableLiveData<String> doLogin(String email, String password){
+
+        final MutableLiveData<String> idCoachRepository = new MutableLiveData<>();
+        if(getIdCoach() == null){
+
+            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                            if(task.isSuccessful()){
+
+                                String id = task.getResult().getUser().getUid();
+                                idCoachRepository.setValue(id);
+                                setIdCoach(id);
+                            }else{
+
+                                idCoachRepository.setValue(null);
+                            }
+                        }
+                    });
+        }else{
+
+            idCoachRepository.setValue(getIdCoach());
+        }
+
+        return idCoachRepository;
+    }
+
+    public void doLogout(Context context){
+
+        context.deleteDatabase(CreateDB.DB_NAME);
+        deleteIdCoach();
     }
 
     public static List<Student> getStudentsFirebase(int id_coach){
