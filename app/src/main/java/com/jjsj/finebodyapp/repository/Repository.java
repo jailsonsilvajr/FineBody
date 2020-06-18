@@ -230,6 +230,29 @@ public class Repository {
         return idCoachRepository;
     }
 
+    public MutableLiveData<String> doRegister(String email, String password){
+
+        final MutableLiveData<String> idCoach = new MutableLiveData<>();
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                        if(task.isSuccessful()){
+
+                            String id = task.getResult().getUser().getUid();
+                            idCoach.setValue(id);
+                            setIdCoach(id);
+                        }else{
+
+                            idCoach.setValue(null);
+                        }
+                    }
+                });
+
+        return idCoach;
+    }
+
     public void doLogout(Context context){
 
         context.deleteDatabase(CreateDB.DB_NAME);

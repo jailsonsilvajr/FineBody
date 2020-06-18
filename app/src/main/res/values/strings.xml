@@ -13,4 +13,6 @@
     <string name="MessageAlertLoginFail">Email ou senha errados</string>
     <string name="TitleAlertDifferentPasswords">Tente novamente</string>
     <string name="MessageDifferentPasswords">As senhas não são iguais</string>
+    <string name="TitleAlertRegisterFail">Tente novamente</string>
+    <string name="MessageAlertRegisterFail">Email já cadastrado</string>
 </resources>
