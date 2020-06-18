@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -25,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_login);
 
         this.viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
         this.buttonEnter = findViewById(R.id.layout_login_button_enter);
@@ -61,10 +62,15 @@ public class LoginActivity extends AppCompatActivity {
                     .show();
         }else{
 
+            final ProgressBar progressBar = findViewById(R.id.layout_login_progressBar);
+            progressBar.setVisibility(View.VISIBLE);
+
             this.viewModelLogin.doLogin(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
             this.viewModelLogin.getIdCoach().observe(this, new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
+
+                    progressBar.setVisibility(View.GONE);
 
                     if(s == null){
 

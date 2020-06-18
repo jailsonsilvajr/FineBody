@@ -4,11 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -54,11 +54,15 @@ public class RegisterActivity extends AppCompatActivity {
             displayDialog(getResources().getString(R.string.TitleAlertDifferentPasswords), getResources().getString(R.string.MessageDifferentPasswords));
         }else{
 
+            final ProgressBar progressBar = findViewById(R.id.layout_register_progressBar);
+            progressBar.setVisibility(View.VISIBLE);
+
             this.viewModelRegister.doRegister(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
             this.viewModelRegister.getIdCoach().observe(this, new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
 
+                    progressBar.setVisibility(View.GONE);
                     if(s == null){
 
                         new MaterialAlertDialogBuilder(RegisterActivity.this)
