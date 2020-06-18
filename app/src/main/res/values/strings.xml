@@ -3,10 +3,14 @@
 
     <string name="email">Email</string>
     <string name="password">Senha</string>
+    <string name="repeatPassword">Repetir Senha</string>
     <string name="enter">Entrar</string>
     <string name="register">Cadastrar</string>
+    <string name="login">Login</string>
     <string name="TitleAlertEmailOrPasswordInvalid">Ops!</string>
     <string name="MessageAlertEmailOrPasswordInvalid">Email ou senha inválidos</string>
     <string name="TitleAlertLoginFail">Tente novamente</string>
     <string name="MessageAlertLoginFail">Email ou senha errados</string>
+    <string name="TitleAlertDifferentPasswords">Tente novamente</string>
+    <string name="MessageDifferentPasswords">As senhas não são iguais</string>
 </resources>

@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,7 +15,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.viewmodels.ViewModelLogin;
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private ViewModelLogin viewModelLogin;
 
@@ -35,6 +36,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 doLogin();
+            }
+        });
+
+        this.buttonRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openActivityRegister();
             }
         });
     }
@@ -59,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if(s == null){
 
-                        new MaterialAlertDialogBuilder(MainActivity.this)
+                        new MaterialAlertDialogBuilder(LoginActivity.this)
                                 .setTitle(getResources().getString(R.string.TitleAlertLoginFail))
                                 .setMessage(getResources().getString(R.string.MessageAlertLoginFail))
                                 .show();
@@ -76,5 +85,11 @@ public class MainActivity extends AppCompatActivity {
     private void openActivityStudents(String idCoach){
 
         Toast.makeText(this, "ID: " + idCoach, Toast.LENGTH_LONG).show();
+    }
+
+    private void openActivityRegister(){
+
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
