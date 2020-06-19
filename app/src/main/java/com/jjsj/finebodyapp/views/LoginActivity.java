@@ -9,10 +9,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.viewmodels.ViewModelLogin;
 
@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
             final ProgressBar progressBar = findViewById(R.id.layout_login_progressBar);
             progressBar.setVisibility(View.VISIBLE);
 
-            this.viewModelLogin.doLogin(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
+            this.viewModelLogin.checkCredentials(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
             this.viewModelLogin.getIdCoach().observe(this, new Observer<String>() {
                 @Override
                 public void onChanged(String s) {
@@ -80,16 +80,18 @@ public class LoginActivity extends AppCompatActivity {
                                 .show();
                     }else{
 
-                        openActivityStudents(s);
+                        viewModelLogin.insertIdCoachInRepository(s);
+                        openActivityStudents();
                     }
                 }
             });
         }
     }
 
-    private void openActivityStudents(String idCoach){
+    private void openActivityStudents(){
 
-        Toast.makeText(this, "ID: " + idCoach, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, StudentsActivity.class);
+        startActivity(intent);
     }
 
     private void openActivityRegister(){

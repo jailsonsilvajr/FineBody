@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 
@@ -20,6 +21,7 @@ public class CreateDB extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
 
+        db.execSQL(Coach.SQL_CREATE_TABLE_COACH);
         db.execSQL(Student.SQL_CREATE_TABLE_STUDENT);
         db.execSQL(Measure.SQL_CREATE_TABLE_MEASURE);
     }
@@ -27,6 +29,7 @@ public class CreateDB extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+        db.execSQL(Coach.SQL_DELETE_TABLE_COACH);
         db.execSQL(Student.SQL_DELETE_TABLE_STUDENT);
         db.execSQL(Measure.SQL_DELETE_TABLE_MEASURE);
         onCreate(db);

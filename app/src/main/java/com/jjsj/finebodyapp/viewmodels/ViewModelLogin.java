@@ -9,7 +9,7 @@ import com.jjsj.finebodyapp.repository.Repository;
 
 public class ViewModelLogin extends AndroidViewModel {
 
-    private LiveData<String> idCoachViewModel;
+    private LiveData<String> idCoach;
     private Repository repository;
 
     public ViewModelLogin(Application application){
@@ -20,11 +20,16 @@ public class ViewModelLogin extends AndroidViewModel {
 
     public LiveData<String> getIdCoach(){
 
-        return this.idCoachViewModel;
+        return this.idCoach;
     }
 
-    public void doLogin(String email, String password){
+    public void checkCredentials(String email, String password){
 
-        this.idCoachViewModel = this.repository.doLogin(email, password);
+        this.idCoach = this.repository.checkCredentials(email, password);
+    }
+
+    public void insertIdCoachInRepository(String id){
+
+        this.repository.insertIdCoach(id);
     }
 }

@@ -14,6 +14,7 @@ public class Measure implements BaseColumns {
     private float right_calf;
     private float left_calf;
     private long id_student;
+    private String id_coach;
 
     public static final String TABLE_NAME = "measures";
 
@@ -26,6 +27,7 @@ public class Measure implements BaseColumns {
     public static final String COLUMN_RIGHT_CALF = "right_calf";
     public static final String COLUMN_LEFT_CALF = "left_calf";
     public static final String COLUMN_ID_STUDENT = "id_student";
+    public static final String COLUMN_ID_COACH = "id_coach";
 
     //Query create table Measure
     public static final String SQL_CREATE_TABLE_MEASURE =
@@ -40,7 +42,7 @@ public class Measure implements BaseColumns {
                     Measure.COLUMN_RIGHT_CALF + " REAL," +
                     Measure.COLUMN_LEFT_CALF + " REAL," +
                     Measure.COLUMN_ID_STUDENT + " INTEGER," +
-                    "FOREIGN KEY (" + Measure.COLUMN_ID_STUDENT + ") REFERENCES " + Student.TABLE_NAME + " (" + Student._ID + "))";
+                    Measure.COLUMN_ID_COACH + " TEXT)";
 
     //Query delete table Measure
     public static final String SQL_DELETE_TABLE_MEASURE = "DROP TABLE IF EXISTS " + Measure.TABLE_NAME;
@@ -123,5 +125,13 @@ public class Measure implements BaseColumns {
 
     public void setId_student(long id_student) {
         this.id_student = id_student;
+    }
+
+    public String getId_coach() {
+        return id_coach;
+    }
+
+    public void setId_coach(String id_coach) {
+        this.id_coach = id_coach;
     }
 }

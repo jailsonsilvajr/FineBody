@@ -10,9 +10,6 @@ import com.jjsj.finebodyapp.repository.Repository;
 public class ViewModelRegister extends AndroidViewModel {
 
     private LiveData<String> idCoach;
-    private String email;
-    private String password;
-    private String repeatPassword;
 
     private Repository repository;
 
@@ -26,20 +23,13 @@ public class ViewModelRegister extends AndroidViewModel {
         return idCoach;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getRepeatPassword() {
-        return repeatPassword;
-    }
-
     public void doRegister(String email, String password){
 
         this.idCoach = this.repository.doRegister(email, password);
+    }
+
+    public void insertIdCoachInRepository(String id){
+
+        this.repository.insertIdCoach(id);
     }
 }

@@ -4,12 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
@@ -71,16 +71,18 @@ public class RegisterActivity extends AppCompatActivity {
                                 .show();
                     }else{
 
-                        openActivityStudents(s);
+                        viewModelRegister.insertIdCoachInRepository(s);
+                        openActivityStudents();
                     }
                 }
             });
         }
     }
 
-    private void openActivityStudents(String idCoach){
+    private void openActivityStudents(){
 
-        Toast.makeText(this, "ID: " + idCoach, Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, StudentsActivity.class);
+        startActivity(intent);
     }
 
     private void displayDialog(String title, String message){

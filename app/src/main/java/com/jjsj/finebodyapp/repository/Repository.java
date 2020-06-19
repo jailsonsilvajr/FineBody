@@ -14,11 +14,18 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jjsj.finebodyapp.database.sqlite.CreateDB;
+import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Repository {
@@ -27,7 +34,7 @@ public class Repository {
     private static SharedPreferences preferences;
     private static CreateDB db_sqlite;
 
-    private static final String key_idCoach = "idCoach";
+    private static final String keyPreferenceFirstLogin = "keyFirstlogin";
 
     private Repository(){}
 
@@ -36,11 +43,13 @@ public class Repository {
         if(repository == null){
 
             repository = new Repository();
-            preferences = context.getSharedPreferences("key_idCoach", Context.MODE_PRIVATE);
+
             File dbFile = context.getDatabasePath(CreateDB.DB_NAME);
             if(dbFile.exists()){
 
+                context.deleteDatabase(CreateDB.DB_NAME);//REMOVEEEEEEEERRR
                 db_sqlite = new CreateDB(context);
+                preferences = context.getSharedPreferences(keyPreferenceFirstLogin, Context.MODE_PRIVATE);
             }else{
 
                 //List<Student> listStudents = getStudentsFirebase(id_coach);
@@ -53,104 +62,180 @@ public class Repository {
         return repository;
     }
 
-    public Cursor getRepositoryStudents() {
+    public void insertIdCoach(String id){
 
-        Cursor cursor;
+        SQLiteDatabase database = db_sqlite.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(Coach.NAME_COLUMN_ID_FIREBASE, id);
+        database.insert(Coach.TABLE_NAME, null, values);
+        database.close();
 
-        SQLiteDatabase db = db_sqlite.getReadableDatabase();
-        cursor = db.query(Student.TABLE_NAME, null, null, null, null, null, null);
-
-        if(cursor != null) cursor.moveToFirst();
-        db.close();
-        return cursor;
+        setPreferenceFirstLogin(true);
     }
 
-    public Cursor getRepositoryMeasures(int id_student) {
+    public MutableLiveData<Coach> getCoach(){
 
+        MutableLiveData<Coach> result = new MutableLiveData<>();
         Cursor cursor;
+        SQLiteDatabase database = db_sqlite.getReadableDatabase();
+        cursor = database.query(Coach.TABLE_NAME, null, null, null, null, null, null);
+        Coach coach = new Coach();
+        if(cursor.moveToFirst()){
 
-        String whereClause = Student._ID + " = ?";
-        String[] whereArgs = {Integer.toString(id_student)};
-
-        SQLiteDatabase db = db_sqlite.getReadableDatabase();
-        cursor = db.query(Measure.TABLE_NAME, null, whereClause, whereArgs, null, null, Measure.COLUMN_DATE);
-
-        if(cursor != null) cursor.moveToFirst();
-        db.close();
-        return cursor;
+            coach.setId(cursor.getLong(0));
+            coach.setIdCoach(cursor.getString(1));
+        }
+        result.setValue(coach);
+        return result;
     }
 
-    //insertStudent
-    public long insertStudent(Student student){
+    private void setPreferenceFirstLogin(boolean x){
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(keyPreferenceFirstLogin, x);
+        editor.apply();
+    }
+
+    private boolean getPreferenceFirstLogin(){
+
+        return preferences.getBoolean(keyPreferenceFirstLogin, false);
+    }
+
+    public MutableLiveData<List<Student>> getStudentsRepository(Coach coach) {
+
+        final MutableLiveData<List<Student>> result = new MutableLiveData<>();
+        final List<Student> studentsList = new ArrayList<>();
+
+        if(getPreferenceFirstLogin()){
+
+            setPreferenceFirstLogin(false);
+            //Firebase
+            FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+            CollectionReference collectionReference = firebaseFirestore.collection("students");
+            Query query = collectionReference.whereEqualTo("id_coach", coach.getIdCoach());
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                    if(task.isSuccessful()){
+
+                        for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+
+                            Student student = new Student();
+                            student.setId(Long.parseLong(documentSnapshot.get("id").toString()));
+                            student.setName(documentSnapshot.get("name").toString());
+                            student.setGenre(documentSnapshot.get("genre").toString());
+                            student.setAge(Integer.parseInt(documentSnapshot.get("age").toString()));
+                            student.setPath_photo(documentSnapshot.get("path_photo").toString());
+                            student.setPath_photo1(documentSnapshot.get("path_photo1").toString());
+                            student.setPath_photo2(documentSnapshot.get("path_photo2").toString());
+                            student.setPath_photo3(documentSnapshot.get("path_photo3").toString());
+                            student.setPath_photo4(documentSnapshot.get("path_photo4").toString());
+                            student.setPath_photo5(documentSnapshot.get("path_photo5").toString());
+                            student.setPath_photo6(documentSnapshot.get("path_photo6").toString());
+                            student.setPath_photo7(documentSnapshot.get("path_photo7").toString());
+                            student.setPath_photo8(documentSnapshot.get("path_photo8").toString());
+                            student.setPath_photo9(documentSnapshot.get("path_photo9").toString());
+                            student.setPath_photo10(documentSnapshot.get("path_photo10").toString());
+                            student.setId_coach(documentSnapshot.get("id_coach").toString());
+
+                            studentsList.add(student);
+                        }
+                    }
+                    result.setValue(studentsList);
+                }
+            });
+        }else{
+
+            //SQLite
+            Cursor cursor;
+            SQLiteDatabase database = db_sqlite.getReadableDatabase();
+            String whereClause = Coach._ID + " = ?";
+            String[] whereArgs = {Long.toString(coach.getId())};
+            cursor = database.query(Student.TABLE_NAME, null, whereClause, whereArgs, null, null, null);
+            if(cursor.moveToFirst()){
+
+                do{
+
+                    Student newStudent = new Student();
+                    newStudent.setId(Long.getLong(cursor.getString(0)));
+                    newStudent.setName(cursor.getString(1));
+                    newStudent.setGenre(cursor.getString(2));
+                    newStudent.setAge(Integer.getInteger(cursor.getString(3)));
+                    newStudent.setPath_photo(cursor.getString(4));
+                    newStudent.setPath_photo1(cursor.getString(5));
+                    newStudent.setPath_photo2(cursor.getString(6));
+                    newStudent.setPath_photo3(cursor.getString(7));
+                    newStudent.setPath_photo4(cursor.getString(8));
+                    newStudent.setPath_photo5(cursor.getString(9));
+                    newStudent.setPath_photo6(cursor.getString(10));
+                    newStudent.setPath_photo7(cursor.getString(11));
+                    newStudent.setPath_photo8(cursor.getString(12));
+                    newStudent.setPath_photo9(cursor.getString(13));
+                    newStudent.setPath_photo10(cursor.getString(14));
+                    newStudent.setId_coach(cursor.getString(15));
+
+                    studentsList.add(newStudent);
+
+                }while (cursor.moveToNext());
+                database.close();
+            }
+            result.setValue(studentsList);
+        }
+
+        return result;
+    }
+
+    public long insertStudentRepository(Student student){
 
         long newId;
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         newId = db.insert(Student.TABLE_NAME, null, getValuesStudent(student));
         db.close();
-
-        if(newId  != -1){
-
-            //Insert in firebase <-------------------------------------------------------------------------------
-        }
-
         return newId;
     }
 
-    //updateStudent
-    public boolean updateStudent(Student student){
+    public boolean updateStudentRepository(Student student){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Student._ID + " = ?";
         String[] whereArgs = {Long.toString(student.getId())};
-        if(db.update(Student.TABLE_NAME, getValuesStudent(student), whereClause, whereArgs) == 0) {
-
-            db.close();
-            return false;
-        }
+        int result = db.update(Student.TABLE_NAME, getValuesStudent(student), whereClause, whereArgs);
         db.close();
 
-        //Update in firebase <-------------------------------------------------------------------------------
-
+        if(result == 0) return false;
         return true;
     }
 
-    //deleteStudent
-    public boolean deleteStudent(Student student){
+    public boolean deleteStudentRepository(Student student){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Student._ID + " = ?";
         String[] whereArgs = {Long.toString(student.getId())};
-        if(db.delete(Student.TABLE_NAME, whereClause, whereArgs) == 0) {
-
-            db.close();
-            return false;
-        }
+        int result = db.delete(Student.TABLE_NAME, whereClause, whereArgs);
         db.close();
 
-        //Delete in firebase <-------------------------------------------------------------------------------
-
+        if(result == 0)  return false;
         return true;
     }
 
-    //saveMeasure
-    public long insertMeasure(Measure measure){
+    public MutableLiveData<List<Measure>> getMeasuresRepository(Student student) {
+
+
+        return null;
+    }
+
+    public long insertMeasureRepository(Measure measure){
 
         long newId;
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         newId = db.insert(Measure.TABLE_NAME, null, getValuesMeasure(measure));
         db.close();
-
-        if(newId != -1){
-
-            //Insert in firebase <-------------------------------------------------------------------------------
-        }
-
         return newId;
 
     }
 
-    //updateMeasure
-    public boolean updateMeasure(Measure measure){
+    public boolean updateMeasureRepository(Measure measure){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Measure._ID + " = ?";
@@ -159,13 +244,10 @@ public class Repository {
         db.close();
 
         if(result == 0) return false;
-
-        //update in firebase <-------------------------------------------------------------------------------
         return true;
     }
 
-    //deleteMeasure
-    public boolean deleteMeasure(Measure measure){
+    public boolean deleteMeasureRepository(Measure measure){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Measure._ID + " = ?";
@@ -174,60 +256,24 @@ public class Repository {
         db.close();
 
         if(result == 0) return false;
-
-        //delete in firebase <-------------------------------------------------------------------------------
         return true;
     }
 
-    //set id Coach in preferences
-    public void setIdCoach(String id_coach){
+    public MutableLiveData<String> checkCredentials(String email, String password){ //Only check email and password
 
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("key_idCoach", id_coach);
-        editor.apply();
-    }
+        final MutableLiveData<String> result = new MutableLiveData<>();
 
-    //get id Coach in preferences
-    public String getIdCoach(){
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
 
-        return preferences.getString(key_idCoach, null);
-    }
+                        if(task.isSuccessful()) result.setValue(task.getResult().getUser().getUid());
+                        else result.setValue(null);
+                    }
+                });
 
-    //delete id Coach in preferences
-    public void deleteIdCoach(){
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.remove(key_idCoach);
-    }
-
-    public MutableLiveData<String> doLogin(String email, String password){
-
-        final MutableLiveData<String> idCoachRepository = new MutableLiveData<>();
-        if(getIdCoach() == null){
-
-            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-            firebaseAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-
-                            if(task.isSuccessful()){
-
-                                String id = task.getResult().getUser().getUid();
-                                idCoachRepository.setValue(id);
-                                setIdCoach(id);
-                            }else{
-
-                                idCoachRepository.setValue(null);
-                            }
-                        }
-                    });
-        }else{
-
-            idCoachRepository.setValue(getIdCoach());
-        }
-
-        return idCoachRepository;
+        return result;
     }
 
     public MutableLiveData<String> doRegister(String email, String password){
@@ -242,7 +288,6 @@ public class Repository {
 
                             String id = task.getResult().getUser().getUid();
                             idCoach.setValue(id);
-                            setIdCoach(id);
                         }else{
 
                             idCoach.setValue(null);
@@ -256,22 +301,13 @@ public class Repository {
     public void doLogout(Context context){
 
         context.deleteDatabase(CreateDB.DB_NAME);
-        deleteIdCoach();
-    }
-
-    public static List<Student> getStudentsFirebase(int id_coach){
-
-        return null;
-    }
-
-    public static List<Measure> getMeasuresFirebase(){
-
-        return null;
+        setPreferenceFirstLogin(true);
     }
 
     private ContentValues getValuesStudent(Student student){
 
         ContentValues values = new ContentValues();
+        if(student.getId() != 0) values.put(Student._ID, student.getId());
         values.put(Student.COLUMN_NAME, student.getName());
         values.put(Student.COLUMN_GENRE, student.getGenre());
         values.put(Student.COLUMN_AGE, student.getAge());
