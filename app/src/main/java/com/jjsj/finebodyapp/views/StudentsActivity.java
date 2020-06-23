@@ -1,13 +1,15 @@
 package com.jjsj.finebodyapp.views;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
@@ -32,15 +34,6 @@ public class StudentsActivity extends AppCompatActivity {
             public void onChanged(Coach coach) {
 
                 getListStudents(coach);
-            }
-        });
-
-        Button button = findViewById(R.id.button);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                doLogout();
             }
         });
     }
@@ -69,5 +62,24 @@ public class StudentsActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_students, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.menu_students_logout:
+                doLogout();
+                return true;
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 }
