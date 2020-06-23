@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +12,7 @@ import android.widget.ProgressBar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.viewmodels.ViewModelRegister;
 
@@ -72,17 +72,11 @@ public class RegisterActivity extends AppCompatActivity {
                     }else{
 
                         viewModelRegister.insertIdCoachInRepository(s);
-                        openActivityStudents();
+                        finish();
                     }
                 }
             });
         }
-    }
-
-    private void openActivityStudents(){
-
-        Intent intent = new Intent(this, StudentsActivity.class);
-        startActivity(intent);
     }
 
     private void displayDialog(String title, String message){
@@ -106,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == android.R.id.home){
 
-            finish();
+            onBackPressed();
         }
 
         return super.onOptionsItemSelected(item);

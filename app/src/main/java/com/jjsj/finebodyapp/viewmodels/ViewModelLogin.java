@@ -32,4 +32,9 @@ public class ViewModelLogin extends AndroidViewModel {
 
         this.repository.insertIdCoach(id);
     }
+
+    public void changePreferenceLogged(){
+
+        this.repository.changePreferenceLogged();
+    }
 }

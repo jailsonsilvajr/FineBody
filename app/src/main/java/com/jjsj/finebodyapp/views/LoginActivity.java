@@ -81,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
                     }else{
 
                         viewModelLogin.insertIdCoachInRepository(s);
+                        viewModelLogin.changePreferenceLogged();
                         openActivityStudents();
                     }
                 }
@@ -92,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, StudentsActivity.class);
         startActivity(intent);
+        finish();
     }
 
     private void openActivityRegister(){

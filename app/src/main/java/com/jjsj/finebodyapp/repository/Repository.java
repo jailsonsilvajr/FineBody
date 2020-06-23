@@ -2,7 +2,6 @@ package com.jjsj.finebodyapp.repository;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -23,18 +22,18 @@ import com.jjsj.finebodyapp.database.sqlite.CreateDB;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.preferences.PreferenceFirstLogin;
+import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Repository {
 
     private static Repository repository;
-    private static SharedPreferences preferences;
     private static CreateDB db_sqlite;
-
-    private static final String keyPreferenceFirstLogin = "keyFirstlogin";
+    private static PreferenceLogged preferenceLogged;
+    private static PreferenceFirstLogin preferenceFirstLogin;
 
     private Repository(){}
 
@@ -43,20 +42,9 @@ public class Repository {
         if(repository == null){
 
             repository = new Repository();
-
-            File dbFile = context.getDatabasePath(CreateDB.DB_NAME);
-            if(dbFile.exists()){
-
-                context.deleteDatabase(CreateDB.DB_NAME);//REMOVEEEEEEEERRR
-                db_sqlite = new CreateDB(context);
-                preferences = context.getSharedPreferences(keyPreferenceFirstLogin, Context.MODE_PRIVATE);
-            }else{
-
-                //List<Student> listStudents = getStudentsFirebase(id_coach);
-                //List<Measure> listMeasures = getMeasuresFirebase();
-                db_sqlite = new CreateDB(context);
-                //povoar database sqlite
-            }
+            preferenceLogged = new PreferenceLogged(context);
+            preferenceFirstLogin = new PreferenceFirstLogin(context);
+            db_sqlite = new CreateDB(context);
         }
 
         return repository;
@@ -69,8 +57,6 @@ public class Repository {
         values.put(Coach.NAME_COLUMN_ID_FIREBASE, id);
         database.insert(Coach.TABLE_NAME, null, values);
         database.close();
-
-        setPreferenceFirstLogin(true);
     }
 
     public MutableLiveData<Coach> getCoach(){
@@ -89,26 +75,15 @@ public class Repository {
         return result;
     }
 
-    private void setPreferenceFirstLogin(boolean x){
-
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(keyPreferenceFirstLogin, x);
-        editor.apply();
-    }
-
-    private boolean getPreferenceFirstLogin(){
-
-        return preferences.getBoolean(keyPreferenceFirstLogin, false);
-    }
-
     public MutableLiveData<List<Student>> getStudentsRepository(Coach coach) {
 
         final MutableLiveData<List<Student>> result = new MutableLiveData<>();
         final List<Student> studentsList = new ArrayList<>();
 
-        if(getPreferenceFirstLogin()){
+        if(preferenceFirstLogin.getPreference()){
 
-            setPreferenceFirstLogin(false);
+            preferenceFirstLogin.setPreference(false);
+
             //Firebase
             FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
             CollectionReference collectionReference = firebaseFirestore.collection("students");
@@ -298,10 +273,19 @@ public class Repository {
         return idCoach;
     }
 
-    public void doLogout(Context context){
+    public void deleteDatabaseSQLite(Context context){
 
         context.deleteDatabase(CreateDB.DB_NAME);
-        setPreferenceFirstLogin(true);
+    }
+
+    public void changePreferenceLogged(){
+
+        preferenceLogged.setPreference(!preferenceLogged.getPreference());
+    }
+
+    public void changePreferenceFirstLogin(){
+
+        preferenceFirstLogin.setPreference(!preferenceFirstLogin.getPreference());
     }
 
     private ContentValues getValuesStudent(Student student){

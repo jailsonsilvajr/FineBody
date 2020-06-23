@@ -45,6 +45,8 @@ public class ViewModelStudents extends AndroidViewModel {
 
     public void logout(){
 
-        this.repository.doLogout(getApplication().getApplicationContext());
+        this.repository.deleteDatabaseSQLite(getApplication().getApplicationContext());
+        this.repository.changePreferenceFirstLogin();
+        this.repository.changePreferenceLogged();
     }
 }
