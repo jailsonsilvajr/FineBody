@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,17 +17,28 @@ import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 import com.jjsj.finebodyapp.viewmodels.ViewModelStudents;
+import com.jjsj.finebodyapp.views.adapter.StudentsAdapter;
 
 import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity {
 
     private ViewModelStudents viewModelStudents;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_students);
+
+        getSupportActionBar().setTitle(getResources().getString(R.string.students));
+
+        this.recyclerView = findViewById(R.id.layout_students_recyclerView);
+        this.recyclerView.setHasFixedSize(true);
+        this.layoutManager = new LinearLayoutManager(this);
+        this.recyclerView.setLayoutManager(this.layoutManager);
 
         this.viewModelStudents = new ViewModelProvider(this).get(ViewModelStudents.class);
         this.viewModelStudents.getCoach();
@@ -52,7 +65,8 @@ public class StudentsActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Student> students) {
 
-
+                adapter = new StudentsAdapter(students);
+                recyclerView.setAdapter(adapter);
             }
         });
     }

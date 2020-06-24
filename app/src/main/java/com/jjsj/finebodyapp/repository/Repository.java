@@ -13,9 +13,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jjsj.finebodyapp.database.sqlite.CreateDB;
@@ -82,82 +80,79 @@ public class Repository {
 
         if(preferenceFirstLogin.getPreference()){
 
-            preferenceFirstLogin.setPreference(false);
+            changePreferenceFirstLogin();
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("students")
+                    .whereEqualTo("id_coach", coach.getIdCoach())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-            //Firebase
-            FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-            CollectionReference collectionReference = firebaseFirestore.collection("students");
-            Query query = collectionReference.whereEqualTo("id_coach", coach.getIdCoach());
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()){
 
-                    if(task.isSuccessful()){
+                                for(QueryDocumentSnapshot document : task.getResult()){
 
-                        for(QueryDocumentSnapshot documentSnapshot : task.getResult()){
+                                    Student student = new Student();
+                                    student.setId(Long.parseLong(document.get("id").toString()));
+                                    student.setName(document.get("name").toString());
+                                    student.setGenre(document.get("genre").toString());
+                                    student.setAge(Integer.parseInt(document.get("age").toString()));
+                                    student.setPath_photo(document.get("path_photo").toString());
+                                    student.setPath_photo1(document.get("path_photo1").toString());
+                                    student.setPath_photo2(document.get("path_photo2").toString());
+                                    student.setPath_photo3(document.get("path_photo3").toString());
+                                    student.setPath_photo4(document.get("path_photo4").toString());
+                                    student.setPath_photo5(document.get("path_photo5").toString());
+                                    student.setPath_photo6(document.get("path_photo6").toString());
+                                    student.setPath_photo7(document.get("path_photo7").toString());
+                                    student.setPath_photo8(document.get("path_photo8").toString());
+                                    student.setPath_photo9(document.get("path_photo9").toString());
+                                    student.setPath_photo10(document.get("path_photo10").toString());
+                                    student.setId_coach(document.get("id_coach").toString());
 
-                            Student student = new Student();
-                            student.setId(Long.parseLong(documentSnapshot.get("id").toString()));
-                            student.setName(documentSnapshot.get("name").toString());
-                            student.setGenre(documentSnapshot.get("genre").toString());
-                            student.setAge(Integer.parseInt(documentSnapshot.get("age").toString()));
-                            student.setPath_photo(documentSnapshot.get("path_photo").toString());
-                            student.setPath_photo1(documentSnapshot.get("path_photo1").toString());
-                            student.setPath_photo2(documentSnapshot.get("path_photo2").toString());
-                            student.setPath_photo3(documentSnapshot.get("path_photo3").toString());
-                            student.setPath_photo4(documentSnapshot.get("path_photo4").toString());
-                            student.setPath_photo5(documentSnapshot.get("path_photo5").toString());
-                            student.setPath_photo6(documentSnapshot.get("path_photo6").toString());
-                            student.setPath_photo7(documentSnapshot.get("path_photo7").toString());
-                            student.setPath_photo8(documentSnapshot.get("path_photo8").toString());
-                            student.setPath_photo9(documentSnapshot.get("path_photo9").toString());
-                            student.setPath_photo10(documentSnapshot.get("path_photo10").toString());
-                            student.setId_coach(documentSnapshot.get("id_coach").toString());
-
-                            studentsList.add(student);
+                                    studentsList.add(student);
+                                }
+                            }
+                            for(int i = 0; i < studentsList.size(); i++) insertStudentRepository(studentsList.get(i));
+                            result.setValue(studentsList);
                         }
-                    }
-                    result.setValue(studentsList);
-                }
-            });
+                    });
         }else{
 
             //SQLite
             Cursor cursor;
             SQLiteDatabase database = db_sqlite.getReadableDatabase();
-            String whereClause = Coach._ID + " = ?";
-            String[] whereArgs = {Long.toString(coach.getId())};
-            cursor = database.query(Student.TABLE_NAME, null, whereClause, whereArgs, null, null, null);
-            if(cursor.moveToFirst()){
+            cursor = database.query(Student.TABLE_NAME, null, null, null, null, null, null);
+            if(cursor.getCount() > 0){
 
+                cursor.moveToFirst();
                 do{
-
                     Student newStudent = new Student();
-                    newStudent.setId(Long.getLong(cursor.getString(0)));
-                    newStudent.setName(cursor.getString(1));
-                    newStudent.setGenre(cursor.getString(2));
-                    newStudent.setAge(Integer.getInteger(cursor.getString(3)));
-                    newStudent.setPath_photo(cursor.getString(4));
-                    newStudent.setPath_photo1(cursor.getString(5));
-                    newStudent.setPath_photo2(cursor.getString(6));
-                    newStudent.setPath_photo3(cursor.getString(7));
-                    newStudent.setPath_photo4(cursor.getString(8));
-                    newStudent.setPath_photo5(cursor.getString(9));
-                    newStudent.setPath_photo6(cursor.getString(10));
-                    newStudent.setPath_photo7(cursor.getString(11));
-                    newStudent.setPath_photo8(cursor.getString(12));
-                    newStudent.setPath_photo9(cursor.getString(13));
-                    newStudent.setPath_photo10(cursor.getString(14));
-                    newStudent.setId_coach(cursor.getString(15));
+
+                    newStudent.setId(Long.parseLong(cursor.getString(cursor.getColumnIndex(Student._ID))));
+                    newStudent.setName(cursor.getString(cursor.getColumnIndex(Student.COLUMN_NAME)));
+                    newStudent.setGenre(cursor.getString(cursor.getColumnIndex(Student.COLUMN_GENRE)));
+                    newStudent.setAge(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Student.COLUMN_AGE))));
+                    newStudent.setPath_photo(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO)));
+                    newStudent.setPath_photo1(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO1)));
+                    newStudent.setPath_photo2(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO2)));
+                    newStudent.setPath_photo3(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO3)));
+                    newStudent.setPath_photo4(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO4)));
+                    newStudent.setPath_photo5(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO5)));
+                    newStudent.setPath_photo6(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO6)));
+                    newStudent.setPath_photo7(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO7)));
+                    newStudent.setPath_photo8(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO8)));
+                    newStudent.setPath_photo9(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO9)));
+                    newStudent.setPath_photo10(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO10)));
+                    newStudent.setId_coach(cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID_COACH)));
 
                     studentsList.add(newStudent);
-
                 }while (cursor.moveToNext());
-                database.close();
             }
+            database.close();
             result.setValue(studentsList);
         }
-
         return result;
     }
 

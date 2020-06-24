@@ -16,4 +16,5 @@
     <string name="TitleAlertRegisterFail">Tente novamente</string>
     <string name="MessageAlertRegisterFail">Email já cadastrado</string>
     <string name="logout">SAIR</string>
+    <string name="students">Alunos</string>
 </resources>

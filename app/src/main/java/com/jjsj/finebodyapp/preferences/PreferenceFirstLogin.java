@@ -21,6 +21,6 @@ public class PreferenceFirstLogin {
 
     public boolean getPreference(){
 
-        return preference.getBoolean(keyPreferenceFirstLogin, false);
+        return preference.getBoolean(keyPreferenceFirstLogin, true);
     }
 }
