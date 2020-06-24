@@ -4,7 +4,10 @@ import android.provider.BaseColumns;
 
 public class Measure implements BaseColumns {
 
-    private long id;
+    private long id_sqlite;
+    private String id_firebase;
+    private long id_student_sqlite;
+    private String id_student_firebase;
     private String date;
     private float weight;
     private float right_arm;
@@ -13,11 +16,13 @@ public class Measure implements BaseColumns {
     private float hip;
     private float right_calf;
     private float left_calf;
-    private long id_student;
-    private String id_coach;
 
     public static final String TABLE_NAME = "measures";
 
+    public static final String COLUMN_ID_SQLITE = "id_sqlite";
+    public static final String COLUMN_ID_FIREBASE = "id_firebase";
+    public static final String COLUMN_ID_STUDENT_SQLITE = "id_student_sqlite";
+    public static final String COLUMN_ID_STUDENT_FIREBASE = "id_student_firebase";
     public static final String COLUMN_DATE = "date";
     public static final String COLUMN_WEIGHT = "weight";
     public static final String COLUMN_RIGHT_ARM = "right_arm";
@@ -26,13 +31,14 @@ public class Measure implements BaseColumns {
     public static final String COLUMN_HIP = "hip";
     public static final String COLUMN_RIGHT_CALF = "right_calf";
     public static final String COLUMN_LEFT_CALF = "left_calf";
-    public static final String COLUMN_ID_STUDENT = "id_student";
-    public static final String COLUMN_ID_COACH = "id_coach";
 
     //Query create table Measure
     public static final String SQL_CREATE_TABLE_MEASURE =
             "CREATE TABLE " + Measure.TABLE_NAME + " (" +
-                    Measure._ID + " INTEGER PRIMARY KEY," +
+                    Measure.COLUMN_ID_SQLITE + " INTEGER PRIMARY KEY," +
+                    Measure.COLUMN_ID_FIREBASE + " TEXT," +
+                    Measure.COLUMN_ID_STUDENT_SQLITE + " INTEGER," +
+                    Measure.COLUMN_ID_STUDENT_FIREBASE + " TEXT," +
                     Measure.COLUMN_DATE + " TEXT," +
                     Measure.COLUMN_WEIGHT + " REAL," +
                     Measure.COLUMN_RIGHT_ARM + " REAL," +
@@ -40,19 +46,41 @@ public class Measure implements BaseColumns {
                     Measure.COLUMN_WAIST + " REAL," +
                     Measure.COLUMN_HIP + " REAL," +
                     Measure.COLUMN_RIGHT_CALF + " REAL," +
-                    Measure.COLUMN_LEFT_CALF + " REAL," +
-                    Measure.COLUMN_ID_STUDENT + " INTEGER," +
-                    Measure.COLUMN_ID_COACH + " TEXT)";
+                    Measure.COLUMN_LEFT_CALF + " REAL)";
 
     //Query delete table Measure
     public static final String SQL_DELETE_TABLE_MEASURE = "DROP TABLE IF EXISTS " + Measure.TABLE_NAME;
 
-    public long getId() {
-        return id;
+    public long getId_sqlite() {
+        return id_sqlite;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setId_sqlite(long id_sqlite) {
+        this.id_sqlite = id_sqlite;
+    }
+
+    public String getId_firebase() {
+        return id_firebase;
+    }
+
+    public void setId_firebase(String id_firebase) {
+        this.id_firebase = id_firebase;
+    }
+
+    public long getId_student_sqlite() {
+        return id_student_sqlite;
+    }
+
+    public void setId_student_sqlite(long id_student_sqlite) {
+        this.id_student_sqlite = id_student_sqlite;
+    }
+
+    public String getId_student_firebase() {
+        return id_student_firebase;
+    }
+
+    public void setId_student_firebase(String id_student_firebase) {
+        this.id_student_firebase = id_student_firebase;
     }
 
     public String getDate() {
@@ -117,21 +145,5 @@ public class Measure implements BaseColumns {
 
     public void setLeft_calf(float left_calf) {
         this.left_calf = left_calf;
-    }
-
-    public long getId_student() {
-        return id_student;
-    }
-
-    public void setId_student(long id_student) {
-        this.id_student = id_student;
-    }
-
-    public String getId_coach() {
-        return id_coach;
-    }
-
-    public void setId_coach(String id_coach) {
-        this.id_coach = id_coach;
     }
 }

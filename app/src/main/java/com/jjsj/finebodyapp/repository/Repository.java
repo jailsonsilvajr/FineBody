@@ -48,11 +48,11 @@ public class Repository {
         return repository;
     }
 
-    public void insertIdCoach(String id){
+    public void insertIdCoach(String id_firebase){
 
         SQLiteDatabase database = db_sqlite.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(Coach.NAME_COLUMN_ID_FIREBASE, id);
+        values.put(Coach.NAME_COLUMN_ID_FIREBASE, id_firebase);
         database.insert(Coach.TABLE_NAME, null, values);
         database.close();
     }
@@ -66,8 +66,8 @@ public class Repository {
         Coach coach = new Coach();
         if(cursor.moveToFirst()){
 
-            coach.setId(cursor.getLong(0));
-            coach.setIdCoach(cursor.getString(1));
+            coach.setId_sqlite(cursor.getLong(cursor.getColumnIndex(Coach.NAME_COLUMN_ID_SQLITE)));
+            coach.setIdCoachFirebase(cursor.getString(cursor.getColumnIndex(Coach.NAME_COLUMN_ID_FIREBASE)));
         }
         result.setValue(coach);
         return result;
@@ -82,8 +82,8 @@ public class Repository {
 
             changePreferenceFirstLogin();
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("students")
-                    .whereEqualTo("id_coach", coach.getIdCoach())
+            db.collection(Student.TABLE_NAME)
+                    .whereEqualTo(Student.COLUMN_ID_COACH_FIREBASE, coach.getId_firebase())
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                         @Override
@@ -94,22 +94,24 @@ public class Repository {
                                 for(QueryDocumentSnapshot document : task.getResult()){
 
                                     Student student = new Student();
-                                    student.setId(Long.parseLong(document.get("id").toString()));
-                                    student.setName(document.get("name").toString());
-                                    student.setGenre(document.get("genre").toString());
-                                    student.setAge(Integer.parseInt(document.get("age").toString()));
-                                    student.setPath_photo(document.get("path_photo").toString());
-                                    student.setPath_photo1(document.get("path_photo1").toString());
-                                    student.setPath_photo2(document.get("path_photo2").toString());
-                                    student.setPath_photo3(document.get("path_photo3").toString());
-                                    student.setPath_photo4(document.get("path_photo4").toString());
-                                    student.setPath_photo5(document.get("path_photo5").toString());
-                                    student.setPath_photo6(document.get("path_photo6").toString());
-                                    student.setPath_photo7(document.get("path_photo7").toString());
-                                    student.setPath_photo8(document.get("path_photo8").toString());
-                                    student.setPath_photo9(document.get("path_photo9").toString());
-                                    student.setPath_photo10(document.get("path_photo10").toString());
-                                    student.setId_coach(document.get("id_coach").toString());
+                                    student.setId_sqlite(Long.parseLong(document.get(Student.COLUMN_ID_SQLITE).toString()));
+                                    student.setId_firebase(document.getId());
+                                    student.setId_coach_sqlite(Long.parseLong(document.get(Student.COLUMN_ID_COACH_SQLITE).toString()));
+                                    student.setId_coach_firebase(document.get(Student.COLUMN_ID_COACH_FIREBASE).toString());
+                                    student.setName(document.get(Student.COLUMN_NAME).toString());
+                                    student.setGenre(document.get(Student.COLUMN_GENRE).toString());
+                                    student.setAge(Integer.parseInt(document.get(Student.COLUMN_AGE).toString()));
+                                    student.setPath_photo(document.get(Student.COLUMN_PATH_PHOTO).toString());
+                                    student.setPath_photo1(document.get(Student.COLUMN_PATH_PHOTO1).toString());
+                                    student.setPath_photo2(document.get(Student.COLUMN_PATH_PHOTO2).toString());
+                                    student.setPath_photo3(document.get(Student.COLUMN_PATH_PHOTO3).toString());
+                                    student.setPath_photo4(document.get(Student.COLUMN_PATH_PHOTO4).toString());
+                                    student.setPath_photo5(document.get(Student.COLUMN_PATH_PHOTO5).toString());
+                                    student.setPath_photo6(document.get(Student.COLUMN_PATH_PHOTO6).toString());
+                                    student.setPath_photo7(document.get(Student.COLUMN_PATH_PHOTO7).toString());
+                                    student.setPath_photo8(document.get(Student.COLUMN_PATH_PHOTO8).toString());
+                                    student.setPath_photo9(document.get(Student.COLUMN_PATH_PHOTO9).toString());
+                                    student.setPath_photo10(document.get(Student.COLUMN_PATH_PHOTO10).toString());
 
                                     studentsList.add(student);
                                 }
@@ -130,7 +132,10 @@ public class Repository {
                 do{
                     Student newStudent = new Student();
 
-                    newStudent.setId(Long.parseLong(cursor.getString(cursor.getColumnIndex(Student._ID))));
+                    newStudent.setId_sqlite(Long.parseLong(cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID_SQLITE))));
+                    newStudent.setId_firebase(cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID_FIREBASE)));
+                    newStudent.setId_coach_sqlite(Long.parseLong(cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID_COACH_SQLITE))));
+                    newStudent.setId_coach_firebase(cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID_COACH_FIREBASE)));
                     newStudent.setName(cursor.getString(cursor.getColumnIndex(Student.COLUMN_NAME)));
                     newStudent.setGenre(cursor.getString(cursor.getColumnIndex(Student.COLUMN_GENRE)));
                     newStudent.setAge(Integer.parseInt(cursor.getString(cursor.getColumnIndex(Student.COLUMN_AGE))));
@@ -145,7 +150,6 @@ public class Repository {
                     newStudent.setPath_photo8(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO8)));
                     newStudent.setPath_photo9(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO9)));
                     newStudent.setPath_photo10(cursor.getString(cursor.getColumnIndex(Student.COLUMN_PATH_PHOTO10)));
-                    newStudent.setId_coach(cursor.getString(cursor.getColumnIndex(Student.COLUMN_ID_COACH)));
 
                     studentsList.add(newStudent);
                 }while (cursor.moveToNext());
@@ -168,8 +172,8 @@ public class Repository {
     public boolean updateStudentRepository(Student student){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
-        String whereClause = Student._ID + " = ?";
-        String[] whereArgs = {Long.toString(student.getId())};
+        String whereClause = Student.COLUMN_ID_SQLITE + " = ?";
+        String[] whereArgs = {Long.toString(student.getId_sqlite())};
         int result = db.update(Student.TABLE_NAME, getValuesStudent(student), whereClause, whereArgs);
         db.close();
 
@@ -180,8 +184,8 @@ public class Repository {
     public boolean deleteStudentRepository(Student student){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
-        String whereClause = Student._ID + " = ?";
-        String[] whereArgs = {Long.toString(student.getId())};
+        String whereClause = Student.COLUMN_ID_SQLITE + " = ?";
+        String[] whereArgs = {Long.toString(student.getId_sqlite())};
         int result = db.delete(Student.TABLE_NAME, whereClause, whereArgs);
         db.close();
 
@@ -191,8 +195,74 @@ public class Repository {
 
     public MutableLiveData<List<Measure>> getMeasuresRepository(Student student) {
 
+        final MutableLiveData<List<Measure>> result = new MutableLiveData<>();
+        final List<Measure> measureList = new ArrayList<>();
+        Cursor cursor;
+        SQLiteDatabase database = db_sqlite.getReadableDatabase();
+        String whereArg = Measure.COLUMN_ID_STUDENT_SQLITE + " = ?";
+        String[] whereClause = {Long.toString(student.getId_sqlite())};
+        cursor = database.query(Measure.TABLE_NAME, null, whereArg, whereClause, null, null, null);
+        if(cursor.getCount() > 0){
 
-        return null;
+            cursor.moveToFirst();
+            do{
+
+                Measure newMeasure = new Measure();
+                newMeasure.setId_sqlite(Long.parseLong(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_ID_SQLITE))));
+                newMeasure.setId_firebase(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_ID_FIREBASE)));
+                newMeasure.setId_student_sqlite(Long.parseLong(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_ID_STUDENT_SQLITE))));
+                newMeasure.setId_student_firebase(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_ID_STUDENT_FIREBASE)));
+                newMeasure.setDate(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_DATE)));
+                newMeasure.setWeight(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_WEIGHT))));
+                newMeasure.setRight_arm(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_RIGHT_ARM))));
+                newMeasure.setLeft_arm(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_LEFT_ARM))));
+                newMeasure.setWaist(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_WAIST))));
+                newMeasure.setHip(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_HIP))));
+                newMeasure.setRight_calf(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_RIGHT_CALF))));
+                newMeasure.setLeft_calf(Float.parseFloat(cursor.getString(cursor.getColumnIndex(Measure.COLUMN_LEFT_CALF))));
+
+                measureList.add(newMeasure);
+            }while(cursor.moveToNext());
+            result.setValue(measureList);
+        }else{
+
+            //Firebase
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection(Measure.TABLE_NAME)
+                    .whereEqualTo(Measure.COLUMN_ID_STUDENT_FIREBASE, student.getId_firebase())
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                            if(task.isSuccessful()){
+
+                                for(QueryDocumentSnapshot document : task.getResult()){
+
+                                    Measure newMeasure = new Measure();
+                                    newMeasure.setId_sqlite(Long.parseLong(document.get(Measure.COLUMN_ID_SQLITE).toString()));
+                                    newMeasure.setId_firebase(document.getId());
+                                    newMeasure.setId_student_sqlite(Long.parseLong(document.get(Measure.COLUMN_ID_STUDENT_SQLITE).toString()));
+                                    newMeasure.setId_student_firebase(document.get(Measure.COLUMN_ID_STUDENT_FIREBASE).toString());
+                                    newMeasure.setDate(document.get(Measure.COLUMN_DATE).toString());
+                                    newMeasure.setWeight(Float.parseFloat(document.get(Measure.COLUMN_WEIGHT).toString()));
+                                    newMeasure.setRight_arm(Float.parseFloat(document.get(Measure.COLUMN_RIGHT_ARM).toString()));
+                                    newMeasure.setLeft_arm(Float.parseFloat(document.get(Measure.COLUMN_LEFT_ARM).toString()));
+                                    newMeasure.setWaist(Float.parseFloat(document.get(Measure.COLUMN_WAIST).toString()));
+                                    newMeasure.setHip(Float.parseFloat(document.get(Measure.COLUMN_HIP).toString()));
+                                    newMeasure.setRight_calf(Float.parseFloat(document.get(Measure.COLUMN_RIGHT_CALF).toString()));
+                                    newMeasure.setLeft_calf(Float.parseFloat(document.get(Measure.COLUMN_LEFT_CALF).toString()));
+
+                                    measureList.add(newMeasure);
+                                }
+                                for(int i = 0; i < measureList.size(); i++) insertMeasureRepository(measureList.get(i));
+                                result.setValue(measureList);
+                            }
+                        }
+                    });
+        }
+        database.close();
+        return result;
     }
 
     public long insertMeasureRepository(Measure measure){
@@ -202,14 +272,13 @@ public class Repository {
         newId = db.insert(Measure.TABLE_NAME, null, getValuesMeasure(measure));
         db.close();
         return newId;
-
     }
 
     public boolean updateMeasureRepository(Measure measure){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
-        String whereClause = Measure._ID + " = ?";
-        String[] whereArgs = {Long.toString(measure.getId())};
+        String whereClause = Measure.COLUMN_ID_SQLITE + " = ?";
+        String[] whereArgs = {Long.toString(measure.getId_sqlite())};
         int result = db.update(Measure.TABLE_NAME, getValuesMeasure(measure), whereClause, whereArgs);
         db.close();
 
@@ -220,8 +289,8 @@ public class Repository {
     public boolean deleteMeasureRepository(Measure measure){
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
-        String whereClause = Measure._ID + " = ?";
-        String[] whereArgs = {Long.toString(measure.getId())};
+        String whereClause = Measure.COLUMN_ID_SQLITE + " = ?";
+        String[] whereArgs = {Long.toString(measure.getId_sqlite())};
         int result = db.delete(Measure.TABLE_NAME, whereClause, whereArgs);
         db.close();
 
@@ -286,7 +355,10 @@ public class Repository {
     private ContentValues getValuesStudent(Student student){
 
         ContentValues values = new ContentValues();
-        if(student.getId() != 0) values.put(Student._ID, student.getId());
+        values.put(Student.COLUMN_ID_SQLITE, student.getId_sqlite());
+        values.put(Student.COLUMN_ID_FIREBASE, student.getId_firebase());
+        values.put(Student.COLUMN_ID_COACH_SQLITE, student.getId_coach_sqlite());
+        values.put(Student.COLUMN_ID_COACH_FIREBASE, student.getId_coach_firebase());
         values.put(Student.COLUMN_NAME, student.getName());
         values.put(Student.COLUMN_GENRE, student.getGenre());
         values.put(Student.COLUMN_AGE, student.getAge());
@@ -301,7 +373,6 @@ public class Repository {
         values.put(Student.COLUMN_PATH_PHOTO8, student.getPath_photo8());
         values.put(Student.COLUMN_PATH_PHOTO9, student.getPath_photo9());
         values.put(Student.COLUMN_PATH_PHOTO10, student.getPath_photo10());
-        values.put(Student.COLUMN_ID_COACH, student.getId_coach());
 
         return values;
     }
@@ -309,6 +380,10 @@ public class Repository {
     private ContentValues getValuesMeasure(Measure measure){
 
         ContentValues values = new ContentValues();
+        values.put(Measure.COLUMN_ID_SQLITE, measure.getId_sqlite());
+        values.put(Measure.COLUMN_ID_FIREBASE, measure.getId_firebase());
+        values.put(Measure.COLUMN_ID_STUDENT_SQLITE, measure.getId_student_sqlite());
+        values.put(Measure.COLUMN_ID_STUDENT_FIREBASE, measure.getId_student_firebase());
         values.put(Measure.COLUMN_DATE, measure.getDate());
         values.put(Measure.COLUMN_WEIGHT, measure.getWeight());
         values.put(Measure.COLUMN_RIGHT_ARM, measure.getRight_arm());
@@ -317,7 +392,6 @@ public class Repository {
         values.put(Measure.COLUMN_HIP, measure.getHip());
         values.put(Measure.COLUMN_RIGHT_CALF, measure.getRight_calf());
         values.put(Measure.COLUMN_LEFT_CALF, measure.getLeft_calf());
-        values.put(Measure.COLUMN_ID_STUDENT, measure.getId_student());
 
         return values;
     }

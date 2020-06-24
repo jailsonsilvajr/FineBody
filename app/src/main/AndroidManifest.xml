@@ -9,26 +9,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <activity android:name=".views.StudentActivity"></activity>
         <activity
             android:name=".views.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.MaterialComponents.NoActionBar">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
             android:name=".views.StudentsActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".views.LoginActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".views.RegisterActivity"
             android:screenOrientation="portrait" />

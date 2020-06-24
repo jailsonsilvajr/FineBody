@@ -4,7 +4,10 @@ import android.provider.BaseColumns;
 
 public class Student implements BaseColumns {
 
-    private long id;
+    private long id_sqlite;
+    private String id_firebase;
+    private long id_coach_sqlite;
+    private String id_coach_firebase;
     private String name;
     private String genre;
     private int age;
@@ -19,10 +22,13 @@ public class Student implements BaseColumns {
     private String path_photo8;
     private String path_photo9;
     private String path_photo10;
-    private String id_coach;
 
-    public static final String TABLE_NAME = "student";
+    public static final String TABLE_NAME = "students";
 
+    public static final String COLUMN_ID_SQLITE = "id_sqlite";
+    public static final String COLUMN_ID_FIREBASE = "id_firebase";
+    public static final String COLUMN_ID_COACH_SQLITE = "id_coach_sqlite";
+    public static final String COLUMN_ID_COACH_FIREBASE = "id_coach_firebase";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_GENRE = "genre";
     public static final String COLUMN_AGE = "age";
@@ -37,12 +43,14 @@ public class Student implements BaseColumns {
     public static final String COLUMN_PATH_PHOTO8 = "path_photo8";
     public static final String COLUMN_PATH_PHOTO9 = "path_photo9";
     public static final String COLUMN_PATH_PHOTO10 = "path_photo10";
-    public static final String COLUMN_ID_COACH = "id_coach";
 
     //Query create table:
     public static final String SQL_CREATE_TABLE_STUDENT =
             "CREATE TABLE " + Student.TABLE_NAME + " (" +
-                    Student._ID + " INTEGER PRIMARY KEY," +
+                    Student.COLUMN_ID_SQLITE + " INTEGER PRIMARY KEY," +
+                    Student.COLUMN_ID_FIREBASE + " TEXT," +
+                    Student.COLUMN_ID_COACH_SQLITE + " INTEGER," +
+                    Student.COLUMN_ID_COACH_FIREBASE + " TEXT," +
                     Student.COLUMN_NAME + " TEXT," +
                     Student.COLUMN_GENRE + " TEXT," +
                     Student.COLUMN_AGE + " INTEGER," +
@@ -56,19 +64,42 @@ public class Student implements BaseColumns {
                     Student.COLUMN_PATH_PHOTO7 + " TEXT," +
                     Student.COLUMN_PATH_PHOTO8 + " TEXT," +
                     Student.COLUMN_PATH_PHOTO9 + " TEXT," +
-                    Student.COLUMN_PATH_PHOTO10 + " TEXT," +
-                    Student.COLUMN_ID_COACH + " TEXT)";
+                    Student.COLUMN_PATH_PHOTO10 + " TEXT)";
 
     //Query delete table:
     public static final String SQL_DELETE_TABLE_STUDENT =
             "DROP TABLE IF EXISTS " + Student.TABLE_NAME;
 
-    public long getId() {
-        return id;
+    public long getId_sqlite() {
+        return id_sqlite;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setId_sqlite(long id_sqlite) {
+        this.id_sqlite = id_sqlite;
+    }
+
+    public String getId_firebase() {
+        return id_firebase;
+    }
+
+    public void setId_firebase(String id_firebase) {
+        this.id_firebase = id_firebase;
+    }
+
+    public long getId_coach_sqlite() {
+        return id_coach_sqlite;
+    }
+
+    public void setId_coach_sqlite(long id_coach_sqlite) {
+        this.id_coach_sqlite = id_coach_sqlite;
+    }
+
+    public String getId_coach_firebase() {
+        return id_coach_firebase;
+    }
+
+    public void setId_coach_firebase(String id_coach_firebase) {
+        this.id_coach_firebase = id_coach_firebase;
     }
 
     public String getName() {
@@ -181,13 +212,5 @@ public class Student implements BaseColumns {
 
     public void setPath_photo10(String path_photo10) {
         this.path_photo10 = path_photo10;
-    }
-
-    public String getId_coach() {
-        return id_coach;
-    }
-
-    public void setId_coach(String id_coach) {
-        this.id_coach = id_coach;
     }
 }
