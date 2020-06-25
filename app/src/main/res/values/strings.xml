@@ -20,6 +20,13 @@
     <string name="profile">Perfil</string>
     <string name="measures">Medidas</string>
     <string name="graph">Gráficos</string>
+    <string name="weight">Peso (kg)</string>
+    <string name="right_arm">Braço Direito (cm)</string>
+    <string name="left_arm">Braço Esquerdo (cm)</string>
+    <string name="waist">Cintura (cm)</string>
+    <string name="hip">Quadril (cm)</string>
+    <string name="right_calf">Panturrilha Direita (cm)</string>
+    <string name="left_calf">Panturrilha Esquerda (cm)</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -8,4 +8,9 @@
         <item name="toolbarStyle">@style/Widget.MaterialComponents.Toolbar.Primary</item>
         <item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox</item>
     </style>
+
+    <style name="spinner_style">
+        <item name="android:background">@drawable/background_spinner</item>
+        <item name="android:popupBackground">@color/colorPrimary</item>
+    </style>
 </resources>

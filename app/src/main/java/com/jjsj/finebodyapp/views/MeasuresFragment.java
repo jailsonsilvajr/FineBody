@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import com.jjsj.finebodyapp.R;
 
@@ -61,6 +63,16 @@ public class MeasuresFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_measures, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_measures, container, false);
+
+        Spinner spinner = view.findViewById(R.id.layout_measures_spinner);
+        String[] dates = {"01/01/2020", "01/02/2020", "01/03/2020"};
+        ArrayAdapter<String> adapter = new ArrayAdapter(getContext(), R.layout.spinner_item, dates);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+
+        return view;
     }
 }
