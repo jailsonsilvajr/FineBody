@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -295,7 +296,12 @@ public class Repository {
         db.close();
 
         if(result == 0) return false;
-        return true;
+        else {
+
+            FirebaseFirestore db_firebase = FirebaseFirestore.getInstance();
+            db_firebase.collection(Measure.TABLE_NAME).document(measure.getId_firebase()).delete();
+            return true;
+        }
     }
 
     public MutableLiveData<String> checkCredentials(String email, String password){ //Only check email and password

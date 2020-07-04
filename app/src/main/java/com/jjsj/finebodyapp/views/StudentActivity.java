@@ -1,9 +1,12 @@
 package com.jjsj.finebodyapp.views;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -19,6 +22,9 @@ public class StudentActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show button
+        getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         this.tabLayout = findViewById(R.id.layout_student_tabLayout);
         this.viewPager = findViewById(R.id.layout_student_viewPager);
@@ -42,4 +48,25 @@ public class StudentActivity extends AppCompatActivity {
             }
         }).attach();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_student, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.menu_student_delete: deleteStudent();
+            return true;
+            case android.R.id.home: finish();
+            return true;
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void deleteStudent(){}
 }

@@ -68,6 +68,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
             public void onClick(View v) {
 
                 Intent intent = new Intent(holder.context, StudentActivity.class);
+                intent.putExtra("student", students.get(position));
                 holder.context.startActivity(intent);
             }
         });

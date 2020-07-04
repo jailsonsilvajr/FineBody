@@ -1,8 +1,12 @@
 package com.jjsj.finebodyapp.database.sqlite.entitys;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.BaseColumns;
 
-public class Student implements BaseColumns {
+import java.io.Serializable;
+
+public class Student implements BaseColumns, Serializable {
 
     private long id_sqlite;
     private String id_firebase;
@@ -213,4 +217,35 @@ public class Student implements BaseColumns {
     public void setPath_photo10(String path_photo10) {
         this.path_photo10 = path_photo10;
     }
+
+    /*@Override
+    public int describeContents() {
+
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeLong(id_sqlite);
+        dest.writeString(id_firebase);
+        dest.writeLong(id_coach_sqlite);
+        dest.writeString(id_coach_firebase);
+        dest.writeString(name);
+        dest.writeString(genre);
+        dest.writeInt(age);
+        dest.writeString(path_photo);
+        dest.writeString(path_photo1);
+        dest.writeString(path_photo2);
+        dest.writeString(path_photo3);
+        dest.writeString(path_photo4);
+        dest.writeString(path_photo5);
+        dest.writeString(path_photo6);
+        dest.writeString(path_photo7);
+        dest.writeString(path_photo8);
+        dest.writeString(path_photo9);
+        dest.writeString(path_photo10);
+    }
+
+    public static*/
 }
