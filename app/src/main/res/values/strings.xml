@@ -18,6 +18,7 @@
     <string name="logout">SAIR</string>
     <string name="students">Alunos</string>
     <string name="new_datas">Novos Dados</string>
+    <string name="edit_datas">Editar Dados</string>
     <string name="profile">Perfil</string>
     <string name="measures">Medidas</string>
     <string name="graph">Gráficos</string>

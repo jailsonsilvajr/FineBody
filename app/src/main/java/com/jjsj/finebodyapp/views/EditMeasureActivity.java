@@ -15,11 +15,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
-import com.jjsj.finebodyapp.viewmodels.ViewModelAddMeasure;
+import com.jjsj.finebodyapp.viewmodels.ViewModelEditMeasure;
 
-public class AddMeasureActivity extends AppCompatActivity {
+public class EditMeasureActivity extends AppCompatActivity {
 
     private Student student;
+    private Measure measure;
     private TextInputLayout textInputLayout_date;
     private TextInputLayout textInputLayout_weight;
     private TextInputLayout textInputLayout_right_arm;
@@ -31,31 +32,39 @@ public class AddMeasureActivity extends AppCompatActivity {
     private Button button_save;
     private ProgressBar progressBar;
 
-    private ViewModelAddMeasure viewModelAddMeasures;
+    private ViewModelEditMeasure viewModelEditMeasure;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_measure);
+        setContentView(R.layout.activity_edit_measure);
 
-        getSupportActionBar().setTitle(getResources().getString(R.string.new_datas));
+        getSupportActionBar().setTitle(getResources().getString(R.string.edit_datas));
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show button
         getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null) this.student = (Student) extras.getSerializable("student");
-        else this.student = null;
+        if(extras != null) {
 
-        this.textInputLayout_date = findViewById(R.id.layout_add_measures_textInput_date);
-        this.textInputLayout_weight = findViewById(R.id.layout_add_measures_textInput_weight);
-        this.textInputLayout_right_arm = findViewById(R.id.layout_add_measures_textInput_right_arm);
-        this.textInputLayout_left_arm = findViewById(R.id.layout_add_measures_textInput_left_arm);
-        this.textInputLayout_waist = findViewById(R.id.layout_add_measures_textInput_waist);
-        this.textInputLayout_hip = findViewById(R.id.layout_add_measures_textInput_hip);
-        this.textInputLayout_right_calf = findViewById(R.id.layout_add_measures_textInput_right_calf);
-        this.textInputLayout_left_calf = findViewById(R.id.layout_add_measures_textInput_left_calf);
-        this.button_save = findViewById(R.id.layout_add_measures_button_save);
+            this.student = (Student) extras.getSerializable("student");
+            this.measure = (Measure) extras.getSerializable("measure");
+        }
+        else{
+
+            this.student = null;
+            this.measure = null;
+        }
+
+        this.textInputLayout_date = findViewById(R.id.layout_edit_measures_textInput_date);
+        this.textInputLayout_weight = findViewById(R.id.layout_edit_measures_textInput_weight);
+        this.textInputLayout_right_arm = findViewById(R.id.layout_edit_measures_textInput_right_arm);
+        this.textInputLayout_left_arm = findViewById(R.id.layout_edit_measures_textInput_left_arm);
+        this.textInputLayout_waist = findViewById(R.id.layout_edit_measures_textInput_waist);
+        this.textInputLayout_hip = findViewById(R.id.layout_edit_measures_textInput_hip);
+        this.textInputLayout_right_calf = findViewById(R.id.layout_edit_measures_textInput_right_calf);
+        this.textInputLayout_left_calf = findViewById(R.id.layout_edit_measures_textInput_left_calf);
+        this.button_save = findViewById(R.id.layout_edit_measures_button_save);
         this.button_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,10 +72,9 @@ public class AddMeasureActivity extends AppCompatActivity {
                 saveMeasure();
             }
         });
-        this.progressBar = findViewById(R.id.layout_add_measures_progressBar);
+        this.progressBar = findViewById(R.id.layout_edit_measures_progressBar);
         this.progressBar.setVisibility(View.GONE);
-
-        this.viewModelAddMeasures = new ViewModelProvider(this).get(ViewModelAddMeasure.class);
+        this.viewModelEditMeasure = new ViewModelProvider(this).get(ViewModelEditMeasure.class);
     }
 
     private void saveMeasure(){
@@ -75,8 +83,11 @@ public class AddMeasureActivity extends AppCompatActivity {
         this.progressBar.setVisibility(View.VISIBLE);
 
         Measure measure = new Measure();
+        measure.setId_sqlite(this.measure.getId_sqlite());
+        measure.setId_firebase(this.measure.getId_firebase());
         measure.setId_student_sqlite(this.student.getId_sqlite());
         measure.setId_student_firebase(this.student.getId_firebase());
+
         measure.setDate(this.textInputLayout_date.getEditText().getText().toString());
         measure.setWeight(Float.parseFloat(this.textInputLayout_weight.getEditText().getText().toString()));
         measure.setRight_arm(Float.parseFloat(this.textInputLayout_right_arm.getEditText().getText().toString()));
@@ -86,8 +97,8 @@ public class AddMeasureActivity extends AppCompatActivity {
         measure.setRight_calf(Float.parseFloat(this.textInputLayout_right_calf.getEditText().getText().toString()));
         measure.setLeft_calf(Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString()));
 
-        this.viewModelAddMeasures.addMeasure(measure);
-        this.viewModelAddMeasures.observeMeasure().observe(this, new Observer<Measure>() {
+        this.viewModelEditMeasure.editMeasure(measure);
+        this.viewModelEditMeasure.observeMeasure().observe(this, new Observer<Measure>() {
             @Override
             public void onChanged(Measure measure) {
 

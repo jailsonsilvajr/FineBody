@@ -2,7 +2,9 @@ package com.jjsj.finebodyapp.database.sqlite.entitys;
 
 import android.provider.BaseColumns;
 
-public class Measure implements BaseColumns {
+import java.io.Serializable;
+
+public class Measure implements BaseColumns, Serializable {
 
     private long id_sqlite;
     private String id_firebase;

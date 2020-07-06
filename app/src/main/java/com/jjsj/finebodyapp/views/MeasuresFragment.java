@@ -84,7 +84,7 @@ public class MeasuresFragment extends Fragment {
             public void onChanged(List<Measure> measures) {
 
                 progressBar.setVisibility(View.GONE);
-                adapter = new MeasuresAdapter(measures);
+                adapter = new MeasuresAdapter(measures, student);
                 recyclerView.setAdapter(adapter);
             }
         });

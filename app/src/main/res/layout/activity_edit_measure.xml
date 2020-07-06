@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".views.AddMeasureActivity">
+    tools:context=".views.EditMeasureActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
             android:layout_height="match_parent">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_date"
+                android:id="@+id/layout_edit_measures_textInput_date"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -42,7 +43,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_weight"
+                android:id="@+id/layout_edit_measures_textInput_weight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -52,7 +53,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_date"
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_date"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -64,7 +65,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_right_arm"
+                android:id="@+id/layout_edit_measures_textInput_right_arm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -74,7 +75,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_weight"
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_weight"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -86,7 +87,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_left_arm"
+                android:id="@+id/layout_edit_measures_textInput_left_arm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -96,7 +97,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_right_arm"
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_right_arm"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -108,7 +109,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_waist"
+                android:id="@+id/layout_edit_measures_textInput_waist"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -118,7 +119,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_left_arm">
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_left_arm">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
@@ -129,7 +130,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_hip"
+                android:id="@+id/layout_edit_measures_textInput_hip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -139,7 +140,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_waist"
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_waist"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -151,7 +152,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_right_calf"
+                android:id="@+id/layout_edit_measures_textInput_right_calf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -161,7 +162,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_hip"
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_hip"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -173,7 +174,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/layout_add_measures_textInput_left_calf"
+                android:id="@+id/layout_edit_measures_textInput_left_calf"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -183,7 +184,7 @@
                 app:boxStrokeColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_right_calf"
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_right_calf"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -195,7 +196,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <Button
-                android:id="@+id/layout_add_measures_button_save"
+                android:id="@+id/layout_edit_measures_button_save"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -208,25 +209,20 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/layout_add_measures_textInput_left_calf" />
+                app:layout_constraintTop_toBottomOf="@id/layout_edit_measures_textInput_left_calf" />
 
             <ProgressBar
-                android:id="@+id/layout_add_measures_progressBar"
+                android:id="@+id/layout_edit_measures_progressBar"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="@id/layout_add_measures_button_save"
+                app:layout_constraintBottom_toBottomOf="@id/layout_edit_measures_button_save"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/layout_add_measures_button_save" />
+                app:layout_constraintTop_toTopOf="@id/layout_edit_measures_button_save" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

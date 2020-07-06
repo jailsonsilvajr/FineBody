@@ -1,6 +1,7 @@
 package com.jjsj.finebodyapp.views.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,17 +15,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
+import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 import com.jjsj.finebodyapp.repository.Repository;
+import com.jjsj.finebodyapp.views.EditMeasureActivity;
 
 import java.util.List;
 
 public class MeasuresAdapter extends RecyclerView.Adapter<MeasuresAdapter.MeasuresViewHolder> {
 
     private List<Measure> measures;
+    private Student student;
 
-    public MeasuresAdapter(List<Measure> measures){
+    public MeasuresAdapter(List<Measure> measures, Student student){
 
         this.measures = measures;
+        this.student = student;
     }
 
     public static class MeasuresViewHolder extends RecyclerView.ViewHolder{
@@ -62,7 +67,10 @@ public class MeasuresAdapter extends RecyclerView.Adapter<MeasuresAdapter.Measur
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(holder.context, "Click: " + position, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(holder.context, EditMeasureActivity.class);
+                intent.putExtra("student", student);
+                intent.putExtra("measure", measures.get(position));
+                holder.context.startActivity(intent);
             }
         });
 

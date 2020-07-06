@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -298,7 +299,9 @@ public class Repository {
         return result;
     }
 
-    public boolean updateMeasureRepository(Measure measure){
+    public MutableLiveData<Measure> updateMeasureRepository(Measure measure){
+        Log.i("UpdateMeasure", "Measure ID: " + measure.getId_sqlite());
+        MutableLiveData<Measure> newMeasure = new MutableLiveData<>();
 
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         String whereClause = Measure.COLUMN_ID_SQLITE + " = ?";
@@ -306,14 +309,24 @@ public class Repository {
         int result = db.update(Measure.TABLE_NAME, getValuesMeasure(measure), whereClause, whereArgs);
         db.close();
 
-        if(result == 0) return false;
-        else{
-
+        if(result == 0) {
+            Log.i("UpdateMeasure", "Result == 0");
+            newMeasure.setValue(null);
+            return newMeasure;
+        }else{
+            Log.i("UpdateMeasure", "Result != 0");
             FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
             firebaseFirestore.collection(Measure.TABLE_NAME).document(measure.getId_firebase())
-                    .set(getMapMeasure(measure));
+                    .set(getMapMeasure(measure))
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                            newMeasure.setValue(measure);
+                        }
+                    });
         }
-        return true;
+        return newMeasure;
     }
 
     public boolean deleteMeasureRepository(Measure measure){
