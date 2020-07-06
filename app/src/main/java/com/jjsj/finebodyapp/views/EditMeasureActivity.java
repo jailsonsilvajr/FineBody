@@ -57,13 +57,29 @@ public class EditMeasureActivity extends AppCompatActivity {
         }
 
         this.textInputLayout_date = findViewById(R.id.layout_edit_measures_textInput_date);
+        this.textInputLayout_date.getEditText().setText(this.measure.getDate());
+
         this.textInputLayout_weight = findViewById(R.id.layout_edit_measures_textInput_weight);
+        this.textInputLayout_weight.getEditText().setText(Float.toString(this.measure.getWeight()));
+
         this.textInputLayout_right_arm = findViewById(R.id.layout_edit_measures_textInput_right_arm);
+        this.textInputLayout_right_arm.getEditText().setText(Float.toString(this.measure.getRight_arm()));
+
         this.textInputLayout_left_arm = findViewById(R.id.layout_edit_measures_textInput_left_arm);
+        this.textInputLayout_left_arm.getEditText().setText(Float.toString(this.measure.getLeft_arm()));
+
         this.textInputLayout_waist = findViewById(R.id.layout_edit_measures_textInput_waist);
+        this.textInputLayout_waist.getEditText().setText(Float.toString(this.measure.getWaist()));
+
         this.textInputLayout_hip = findViewById(R.id.layout_edit_measures_textInput_hip);
+        this.textInputLayout_hip.getEditText().setText(Float.toString(this.measure.getHip()));
+
         this.textInputLayout_right_calf = findViewById(R.id.layout_edit_measures_textInput_right_calf);
+        this.textInputLayout_right_calf.getEditText().setText(Float.toString(this.measure.getRight_calf()));
+
         this.textInputLayout_left_calf = findViewById(R.id.layout_edit_measures_textInput_left_calf);
+        this.textInputLayout_left_calf.getEditText().setText(Float.toString(this.measure.getLeft_calf()));
+
         this.button_save = findViewById(R.id.layout_edit_measures_button_save);
         this.button_save.setOnClickListener(new View.OnClickListener() {
             @Override
