@@ -9,11 +9,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -25,7 +27,9 @@ import com.jjsj.finebodyapp.preferences.PreferenceFirstLogin;
 import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Repository {
 
@@ -266,13 +270,32 @@ public class Repository {
         return result;
     }
 
-    public long insertMeasureRepository(Measure measure){
+    public MutableLiveData<Measure> insertMeasureRepository(Measure measure){
 
+        final MutableLiveData<Measure> result = new MutableLiveData<>();
         long newId;
+
         SQLiteDatabase db = db_sqlite.getWritableDatabase();
         newId = db.insert(Measure.TABLE_NAME, null, getValuesMeasure(measure));
         db.close();
-        return newId;
+
+        if(newId > 0){
+
+            measure.setId_sqlite(newId);
+            FirebaseFirestore dbFirebase = FirebaseFirestore.getInstance();
+            dbFirebase.collection(Measure.TABLE_NAME)
+                    .add(getMapMeasure(measure))
+                    .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+
+                            measure.setId_firebase(documentReference.getId());
+                            updateMeasureRepository(measure);
+                            result.setValue(measure);
+                        }
+                    });
+        }
+        return result;
     }
 
     public boolean updateMeasureRepository(Measure measure){
@@ -284,6 +307,12 @@ public class Repository {
         db.close();
 
         if(result == 0) return false;
+        else{
+
+            FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+            firebaseFirestore.collection(Measure.TABLE_NAME).document(measure.getId_firebase())
+                    .set(getMapMeasure(measure));
+        }
         return true;
     }
 
@@ -298,8 +327,9 @@ public class Repository {
         if(result == 0) return false;
         else {
 
-            FirebaseFirestore db_firebase = FirebaseFirestore.getInstance();
-            db_firebase.collection(Measure.TABLE_NAME).document(measure.getId_firebase()).delete();
+            FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
+            firebaseFirestore.collection(Measure.TABLE_NAME).document(measure.getId_firebase())
+                    .delete();
             return true;
         }
     }
@@ -386,9 +416,9 @@ public class Repository {
     private ContentValues getValuesMeasure(Measure measure){
 
         ContentValues values = new ContentValues();
-        values.put(Measure.COLUMN_ID_SQLITE, measure.getId_sqlite());
+        if(measure.getId_sqlite() != 0) values.put(Measure.COLUMN_ID_SQLITE, Long.toString(measure.getId_sqlite()));
         values.put(Measure.COLUMN_ID_FIREBASE, measure.getId_firebase());
-        values.put(Measure.COLUMN_ID_STUDENT_SQLITE, measure.getId_student_sqlite());
+        values.put(Measure.COLUMN_ID_STUDENT_SQLITE, Long.toString(measure.getId_student_sqlite()));
         values.put(Measure.COLUMN_ID_STUDENT_FIREBASE, measure.getId_student_firebase());
         values.put(Measure.COLUMN_DATE, measure.getDate());
         values.put(Measure.COLUMN_WEIGHT, measure.getWeight());
@@ -400,5 +430,24 @@ public class Repository {
         values.put(Measure.COLUMN_LEFT_CALF, measure.getLeft_calf());
 
         return values;
+    }
+
+    private Map<String, Object> getMapMeasure(Measure measure){
+
+        Map<String, Object> data = new HashMap<>();
+        data.put(Measure.COLUMN_ID_SQLITE, Long.toString(measure.getId_sqlite()));
+        data.put(Measure.COLUMN_ID_FIREBASE, measure.getId_firebase());
+        data.put(Measure.COLUMN_ID_STUDENT_SQLITE, Long.toString(measure.getId_student_sqlite()));
+        data.put(Measure.COLUMN_ID_STUDENT_FIREBASE, measure.getId_student_firebase());
+        data.put(Measure.COLUMN_DATE, measure.getDate());
+        data.put(Measure.COLUMN_WEIGHT, measure.getWeight());
+        data.put(Measure.COLUMN_RIGHT_ARM, measure.getRight_arm());
+        data.put(Measure.COLUMN_LEFT_ARM, measure.getLeft_arm());
+        data.put(Measure.COLUMN_WAIST, measure.getWaist());
+        data.put(Measure.COLUMN_HIP, measure.getHip());
+        data.put(Measure.COLUMN_RIGHT_CALF, measure.getRight_calf());
+        data.put(Measure.COLUMN_LEFT_CALF, measure.getLeft_calf());
+
+        return data;
     }
 }

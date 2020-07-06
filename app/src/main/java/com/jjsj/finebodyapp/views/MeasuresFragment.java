@@ -1,5 +1,6 @@
 package com.jjsj.finebodyapp.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
@@ -43,6 +45,39 @@ public class MeasuresFragment extends Fragment {
         else this.student = null;
 
         this.viewModelMeasures = new ViewModelProvider(this).get(ViewModelMeasures.class);
+
+        View view = inflater.inflate(R.layout.fragment_measures, container, false);
+        this.progressBar = view.findViewById(R.id.layout_measures_progressBar);
+        this.recyclerView = view.findViewById(R.id.layout_measures_recyclerView);
+        this.recyclerView.setHasFixedSize(true);
+        this.layoutManager = new LinearLayoutManager(getContext());
+        this.recyclerView.setLayoutManager(this.layoutManager);
+
+        FloatingActionButton floatingActionButton = view.findViewById(R.id.layout_measures_floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openAddMeasure(student);
+            }
+        });
+
+        return view;
+    }
+
+    private void openAddMeasure(Student student){
+
+        Intent intent = new Intent(getContext(), AddMeasureActivity.class);
+        intent.putExtra("student", student);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+
+        this.progressBar.setVisibility(View.VISIBLE);
         this.viewModelMeasures.getListMeasures(this.student);
         this.viewModelMeasures.observerMeasures().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
             @Override
@@ -53,15 +88,5 @@ public class MeasuresFragment extends Fragment {
                 recyclerView.setAdapter(adapter);
             }
         });
-
-        View view = inflater.inflate(R.layout.fragment_measures, container, false);
-        this.progressBar = view.findViewById(R.id.layout_measures_progressBar);
-        this.progressBar.setVisibility(View.VISIBLE);
-        this.recyclerView = view.findViewById(R.id.layout_measures_recyclerView);
-        this.recyclerView.setHasFixedSize(true);
-        this.layoutManager = new LinearLayoutManager(getContext());
-        this.recyclerView.setLayoutManager(this.layoutManager);
-
-        return view;
     }
 }

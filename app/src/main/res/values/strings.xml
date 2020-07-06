@@ -17,17 +17,20 @@
     <string name="MessageAlertRegisterFail">Email já cadastrado</string>
     <string name="logout">SAIR</string>
     <string name="students">Alunos</string>
+    <string name="new_datas">Novos Dados</string>
     <string name="profile">Perfil</string>
     <string name="measures">Medidas</string>
     <string name="graph">Gráficos</string>
+    <string name="date">DATA (DD/MM/AAAA)</string>
     <string name="weight">PESO (KG)</string>
     <string name="right_arm">BRAÇO DIREITO (CM)</string>
     <string name="left_arm">BRAÇO ESQUERDO (CM)</string>
     <string name="waist">CINTURA (CM)</string>
     <string name="hip">QUADRIL (CM)</string>
     <string name="right_calf">PANTURRILHA DIREITA (CM)</string>
-    <string name="left_calf">Panturrilha Esquerda (cm)</string>
+    <string name="left_calf">PANTURRILHA ESQUERDA (CM)</string>
     <string name="delete">Deletar</string>
+    <string name="save">Salvar</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
