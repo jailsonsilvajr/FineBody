@@ -19,6 +19,7 @@
     <string name="students">Alunos</string>
     <string name="new_datas">Novos Dados</string>
     <string name="edit_datas">Editar Dados</string>
+    <string name="edit">Editar</string>
     <string name="profile">Perfil</string>
     <string name="measures">Medidas</string>
     <string name="graph">Gráficos</string>
@@ -32,6 +33,10 @@
     <string name="left_calf">PANTURRILHA ESQUERDA (CM)</string>
     <string name="delete">Deletar</string>
     <string name="save">Salvar</string>
+    <string name="photos">Fotos</string>
+    <string name="name">Nome</string>
+    <string name="genre">Gênero</string>
+    <string name="age">Idade</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

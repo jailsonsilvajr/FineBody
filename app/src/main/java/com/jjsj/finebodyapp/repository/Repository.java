@@ -4,7 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
@@ -20,6 +23,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.jjsj.finebodyapp.database.sqlite.CreateDB;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
@@ -27,6 +33,8 @@ import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
 import com.jjsj.finebodyapp.preferences.PreferenceFirstLogin;
 import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -399,6 +407,65 @@ public class Repository {
     public void changePreferenceFirstLogin(){
 
         preferenceFirstLogin.setPreference(!preferenceFirstLogin.getPreference());
+    }
+
+    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
+
+        MutableLiveData<byte[]> imgBytes = new MutableLiveData<>();
+
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageReference = firebaseStorage.getReference();
+        StorageReference imgReference = storageReference.child(path);
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        imgReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                imgBytes.setValue(bytes);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                imgBytes.setValue(null);
+            }
+        });
+
+        return imgBytes;
+    }
+
+    public MutableLiveData<Boolean> uploadPhoto(ImageView imageView, String path){
+
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
+        StorageReference imgReference = storageReference.child(path);
+
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imgReference.putBytes(data);
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                result.setValue(true);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                result.setValue(false);
+            }
+        });
+
+        return result;
     }
 
     private ContentValues getValuesStudent(Student student){
