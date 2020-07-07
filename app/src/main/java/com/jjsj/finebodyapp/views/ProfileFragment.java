@@ -1,5 +1,6 @@
 package com.jjsj.finebodyapp.views;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.jjsj.finebodyapp.R;
@@ -29,6 +31,7 @@ public class ProfileFragment extends Fragment {
     private TextView textView_name;
     private TextView textView_genre;
     private TextView textView_age;
+    private Button button_edit;
 
     private ViewModelProfile viewModelProfile;
 
@@ -45,6 +48,15 @@ public class ProfileFragment extends Fragment {
         this.textView_name = view.findViewById(R.id.layout_profile_textView_name);
         this.textView_genre = view.findViewById(R.id.layout_profile_textView_genre);
         this.textView_age = view.findViewById(R.id.layout_profile_textView_age);
+
+        this.button_edit = view.findViewById(R.id.layout_profile_button_edit);
+        this.button_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openEditProfile(student);
+            }
+        });
 
         Bundle extra = getActivity().getIntent().getExtras();
         if(extra != null) {
@@ -83,5 +95,12 @@ public class ProfileFragment extends Fragment {
         }
 
         return view;
+    }
+
+    private void openEditProfile(Student student){
+
+        Intent intent = new Intent(getActivity(), EditProfileActivity.class);
+        intent.putExtra("student", this.student);
+        startActivity(intent);
     }
 }
