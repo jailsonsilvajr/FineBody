@@ -5,36 +5,35 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.jjsj.finebodyapp.database.firebase.Response;
+import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.repository.Repository;
 
 public class ViewModelLogin extends AndroidViewModel {
 
-    private LiveData<String> idCoach;
+    private LiveData<Response> responseLogin;
     private Repository repository;
+    private PreferenceLogged preference;
 
     public ViewModelLogin(Application application){
 
         super(application);
         this.repository = Repository.getInstance(application.getApplicationContext());
+        this.preference = new PreferenceLogged(application.getApplicationContext());
     }
 
-    public LiveData<String> getIdCoach(){
+    public LiveData<Response> observerResponseLogin(){
 
-        return this.idCoach;
+        return this.responseLogin;
     }
 
-    public void checkCredentials(String email, String password){
+    public void doLogin(String email, String password){
 
-        this.idCoach = this.repository.checkCredentials(email, password);
+        this.responseLogin = this.repository.login(email, password);
     }
 
-    public void insertIdCoachInRepository(String id){
+    public void insertIdCoachInPreferences(String idCoach){
 
-        this.repository.insertIdCoach(id);
-    }
-
-    public void changePreferenceLogged(){
-
-        this.repository.changePreferenceLogged();
+        this.preference.setPreference(idCoach);
     }
 }

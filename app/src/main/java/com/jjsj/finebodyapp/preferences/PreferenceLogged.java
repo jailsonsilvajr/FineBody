@@ -13,14 +13,14 @@ public class PreferenceLogged {
         this.preference = context.getSharedPreferences(keyPreferenceLogged, Context.MODE_PRIVATE);
     }
 
-    public void setPreference(boolean x){
+    public void setPreference(String idCoach){
 
         SharedPreferences.Editor editor = preference.edit();
-        editor.putBoolean(keyPreferenceLogged, x).apply();
+        editor.putString(keyPreferenceLogged, idCoach).apply();
     }
 
-    public boolean getPreference(){
+    public String getPreference(){
 
-        return preference.getBoolean(keyPreferenceLogged, false);
+        return preference.getString(keyPreferenceLogged, null);
     }
 }

@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import com.jjsj.finebodyapp.R;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelLogin;
 
 public class LoginActivity extends AppCompatActivity {
@@ -29,6 +30,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         this.viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+
         this.buttonEnter = findViewById(R.id.layout_login_button_enter);
         this.buttonRegister = findViewById(R.id.layout_login_button_register);
 
@@ -65,14 +67,14 @@ public class LoginActivity extends AppCompatActivity {
             final ProgressBar progressBar = findViewById(R.id.layout_login_progressBar);
             progressBar.setVisibility(View.VISIBLE);
 
-            this.viewModelLogin.checkCredentials(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
-            this.viewModelLogin.getIdCoach().observe(this, new Observer<String>() {
+            this.viewModelLogin.doLogin(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
+            this.viewModelLogin.observerResponseLogin().observe(this, new Observer<Response>() {
                 @Override
-                public void onChanged(String s) {
+                public void onChanged(Response res) {
 
                     progressBar.setVisibility(View.GONE);
 
-                    if(s == null){
+                    if(res.getStatus() != 200){
 
                         new MaterialAlertDialogBuilder(LoginActivity.this)
                                 .setTitle(getResources().getString(R.string.TitleAlertLoginFail))
@@ -80,8 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .show();
                     }else{
 
-                        viewModelLogin.insertIdCoachInRepository(s);
-                        viewModelLogin.changePreferenceLogged();
+                        viewModelLogin.insertIdCoachInPreferences(String.class.cast(res.getObject()));
                         openActivityStudents();
                     }
                 }

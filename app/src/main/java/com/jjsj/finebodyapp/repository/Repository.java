@@ -26,6 +26,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.jjsj.finebodyapp.database.firebase.FireRequests;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.database.sqlite.CreateDB;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
 import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
@@ -62,7 +64,141 @@ public class Repository {
         return repository;
     }
 
-    public void insertIdCoach(String id_firebase){
+    public MutableLiveData<Response> login(String email, String password){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.loginCoach(email, password);
+    }
+
+    public MutableLiveData<Response> register(String email, String password){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.registerCoach(email, password);
+    }
+
+    public MutableLiveData<Response> getStudent(String idStudent){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.getOneStudent(idStudent);
+    }
+
+    public MutableLiveData<Response> getStudents(String idCoach){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.getAllStudent(idCoach);
+    }
+
+    public MutableLiveData<Response> insertStudent(com.jjsj.finebodyapp.database.entitys.Student student){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.postOneStudent(student);
+    }
+
+    public MutableLiveData<Response> deleteStudent(String idStudent){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.deleteOneStudent(idStudent);
+    }
+
+    public MutableLiveData<Response> updateStudent(com.jjsj.finebodyapp.database.entitys.Student student){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.putOneStudent(student);
+    }
+
+    public MutableLiveData<Response> getMeasures(String idStudent){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.getAllMeasure(idStudent);
+    }
+
+    public MutableLiveData<Response> insertMeasure(com.jjsj.finebodyapp.database.entitys.Measure measure){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.postOneMeasure(measure);
+    }
+
+    public MutableLiveData<Response> deleteMeasure(String idMeasure){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.deleteOneMeasure(idMeasure);
+    }
+
+    public MutableLiveData<Response> updateMeasure(com.jjsj.finebodyapp.database.entitys.Measure measure){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.putOneMeasure(measure);
+    }
+
+    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.downloadPhoto(path);
+    }
+
+    public MutableLiveData<Boolean> uploadPhoto(ImageView imageView, String path){
+
+        MutableLiveData<Boolean> result = new MutableLiveData<>();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageReference = storage.getReference();
+        StorageReference imgReference = storageReference.child(path);
+
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imgReference.putBytes(data);
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                result.setValue(true);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+
+                result.setValue(false);
+            }
+        });
+
+        return result;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public void insertIdCoach(String id_firebase){ //DELETE!!
 
         SQLiteDatabase database = db_sqlite.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -401,7 +537,7 @@ public class Repository {
 
     public void changePreferenceLogged(){
 
-        preferenceLogged.setPreference(!preferenceLogged.getPreference());
+        //preferenceLogged.setPreference(!preferenceLogged.getPreference());
     }
 
     public void changePreferenceFirstLogin(){
@@ -409,64 +545,7 @@ public class Repository {
         preferenceFirstLogin.setPreference(!preferenceFirstLogin.getPreference());
     }
 
-    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
 
-        MutableLiveData<byte[]> imgBytes = new MutableLiveData<>();
-
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        StorageReference storageReference = firebaseStorage.getReference();
-        StorageReference imgReference = storageReference.child(path);
-
-        final long ONE_MEGABYTE = 1024 * 1024;
-        imgReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-
-                imgBytes.setValue(bytes);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                imgBytes.setValue(null);
-            }
-        });
-
-        return imgBytes;
-    }
-
-    public MutableLiveData<Boolean> uploadPhoto(ImageView imageView, String path){
-
-        MutableLiveData<Boolean> result = new MutableLiveData<>();
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageReference = storage.getReference();
-        StorageReference imgReference = storageReference.child(path);
-
-        imageView.setDrawingCacheEnabled(true);
-        imageView.buildDrawingCache();
-        Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        UploadTask uploadTask = imgReference.putBytes(data);
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                result.setValue(true);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                result.setValue(false);
-            }
-        });
-
-        return result;
-    }
 
     private ContentValues getValuesStudent(Student student){
 

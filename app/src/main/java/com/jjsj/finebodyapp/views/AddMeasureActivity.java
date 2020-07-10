@@ -13,8 +13,9 @@ import android.widget.ProgressBar;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelAddMeasure;
 
 public class AddMeasureActivity extends AppCompatActivity {
@@ -44,8 +45,7 @@ public class AddMeasureActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null) this.student = (Student) extras.getSerializable("student");
-        else this.student = null;
+        this.student = (Student) extras.getSerializable("student");
 
         this.textInputLayout_date = findViewById(R.id.layout_add_measures_textInput_date);
         this.textInputLayout_weight = findViewById(R.id.layout_add_measures_textInput_weight);
@@ -75,23 +75,27 @@ public class AddMeasureActivity extends AppCompatActivity {
         this.progressBar.setVisibility(View.VISIBLE);
 
         Measure measure = new Measure();
-        measure.setId_student_sqlite(this.student.getId_sqlite());
-        measure.setId_student_firebase(this.student.getId_firebase());
+        measure.setId("");
+        measure.setIdStudent(this.student.getId());
         measure.setDate(this.textInputLayout_date.getEditText().getText().toString());
         measure.setWeight(Float.parseFloat(this.textInputLayout_weight.getEditText().getText().toString()));
-        measure.setRight_arm(Float.parseFloat(this.textInputLayout_right_arm.getEditText().getText().toString()));
-        measure.setLeft_arm(Float.parseFloat(this.textInputLayout_left_arm.getEditText().getText().toString()));
+        measure.setRightArm(Float.parseFloat(this.textInputLayout_right_arm.getEditText().getText().toString()));
+        measure.setLeftArm(Float.parseFloat(this.textInputLayout_left_arm.getEditText().getText().toString()));
         measure.setWaist(Float.parseFloat(this.textInputLayout_waist.getEditText().getText().toString()));
         measure.setHip(Float.parseFloat(this.textInputLayout_hip.getEditText().getText().toString()));
-        measure.setRight_calf(Float.parseFloat(this.textInputLayout_right_calf.getEditText().getText().toString()));
-        measure.setLeft_calf(Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString()));
+        measure.setRightCalf(Float.parseFloat(this.textInputLayout_right_calf.getEditText().getText().toString()));
+        measure.setLeftCalf(Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString()));
 
         this.viewModelAddMeasures.addMeasure(measure);
-        this.viewModelAddMeasures.observeMeasure().observe(this, new Observer<Measure>() {
+        this.viewModelAddMeasures.observerResponseMeasure().observe(this, new Observer<Response>() {
             @Override
-            public void onChanged(Measure measure) {
+            public void onChanged(Response res) {
 
-                if(measure != null) finish();
+                if(res.getStatus() == 200){
+
+                    viewModelAddMeasures.updateMeasure(Measure.class.cast(res.getObject()));//insert id in firebase
+                    finish();
+                }
                 else{
 
                     progressBar.setVisibility(View.GONE);

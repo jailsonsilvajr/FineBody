@@ -6,16 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
-
-import java.util.List;
 
 public class ViewModelMeasures extends AndroidViewModel {
 
     private Repository repository;
-    private LiveData<List<Measure>> measures;
+    private LiveData<Response> responseMeasures;
 
     public ViewModelMeasures(@NonNull Application application) {
 
@@ -23,13 +20,13 @@ public class ViewModelMeasures extends AndroidViewModel {
         this.repository = Repository.getInstance(application.getApplicationContext());
     }
 
-    public LiveData<List<Measure>> observerMeasures(){
+    public LiveData<Response> observerResponseMeasures(){
 
-        return this.measures;
+        return this.responseMeasures;
     }
 
-    public void getListMeasures(Student student){
+    public void getMeasures(String idStudent){
 
-        this.measures = this.repository.getMeasuresRepository(student);
+        this.responseMeasures = this.repository.getMeasures(idStudent);
     }
 }

@@ -6,12 +6,13 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
+import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 
 public class ViewModelEditMeasure extends AndroidViewModel {
 
-    private LiveData<Measure> measure;
+    private LiveData<Response> responseMeasure;
     private Repository repository;
 
     public ViewModelEditMeasure(@NonNull Application application) {
@@ -20,13 +21,13 @@ public class ViewModelEditMeasure extends AndroidViewModel {
         this.repository = Repository.getInstance(application.getApplicationContext());
     }
 
-    public LiveData<Measure> observeMeasure(){
+    public LiveData<Response> observerResponseMeasure(){
 
-        return this.measure;
+        return this.responseMeasure;
     }
 
     public void editMeasure(Measure measure){
 
-        this.measure = this.repository.updateMeasureRepository(measure);
+        this.responseMeasure = this.repository.updateMeasure(measure);
     }
 }

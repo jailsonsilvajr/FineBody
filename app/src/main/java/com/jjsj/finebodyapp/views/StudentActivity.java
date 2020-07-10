@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.jjsj.finebodyapp.R;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.database.entitys.Student;
 import com.jjsj.finebodyapp.views.adapter.ViewPagerAdapter;
 
 public class StudentActivity extends AppCompatActivity {
@@ -27,12 +27,8 @@ public class StudentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_student);
 
         Bundle extras = getIntent().getExtras();
-        if(extras != null){
-
-            this.student = (Student) extras.getSerializable("student");
-            getSupportActionBar().setTitle(student.getName());
-        }
-        else this.student = null;
+        this.student = (Student) extras.getSerializable("student");
+        getSupportActionBar().setTitle(student.getName());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show button
         getSupportActionBar().setHomeButtonEnabled(true); //Activate button
@@ -43,8 +39,6 @@ public class StudentActivity extends AppCompatActivity {
         ViewPagerAdapter viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), getLifecycle(), this.tabLayout.getTabCount());
         this.viewPager.setAdapter(viewPagerAdapter);
         this.viewPager.setCurrentItem(1);
-
-
 
         new TabLayoutMediator(this.tabLayout, this.viewPager, (tab, position) -> {
 

@@ -8,14 +8,18 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jjsj.finebodyapp.R;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+
+import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 import com.jjsj.finebodyapp.views.EditMeasureActivity;
 
@@ -25,11 +29,13 @@ public class MeasuresAdapter extends RecyclerView.Adapter<MeasuresAdapter.Measur
 
     private List<Measure> measures;
     private Student student;
+    private LifecycleOwner lifecycleOwner;
 
-    public MeasuresAdapter(List<Measure> measures, Student student){
+    public MeasuresAdapter(List<Measure> measures, Student student, LifecycleOwner lifecycleOwner){
 
         this.measures = measures;
         this.student = student;
+        this.lifecycleOwner = lifecycleOwner;
     }
 
     public static class MeasuresViewHolder extends RecyclerView.ViewHolder{
@@ -80,18 +86,25 @@ public class MeasuresAdapter extends RecyclerView.Adapter<MeasuresAdapter.Measur
 
                 holder.imageView.setVisibility(View.GONE);
                 holder.progressBar.setVisibility(View.VISIBLE);
-                boolean result = Repository.getInstance(v.getContext()).deleteMeasureRepository(measures.get(position));
-                if(result){
+                LiveData<Response> responseLiveData;
+                responseLiveData = Repository.getInstance(v.getContext()).deleteMeasure(measures.get(position).getId());
+                responseLiveData.observe(lifecycleOwner, new Observer<Response>() {
+                    @Override
+                    public void onChanged(Response response) {
 
-                    holder.progressBar.setVisibility(View.GONE);
-                    measures.remove(position);
-                    notifyItemRemoved(position);
-                    notifyItemRangeChanged(position, measures.size());
-                }else{
+                        if(response.getStatus() == 200){
 
-                    holder.imageView.setVisibility(View.VISIBLE);
-                    holder.progressBar.setVisibility(View.GONE);
-                }
+                            holder.progressBar.setVisibility(View.GONE);
+                            measures.remove(position);
+                            notifyItemRemoved(position);
+                            notifyItemRangeChanged(position, measures.size());
+                        }else{
+
+                            holder.imageView.setVisibility(View.VISIBLE);
+                            holder.progressBar.setVisibility(View.GONE);
+                        }
+                    }
+                });
             }
         });
     }

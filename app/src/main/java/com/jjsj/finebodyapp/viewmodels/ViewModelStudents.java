@@ -5,48 +5,48 @@ import android.app.Application;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.jjsj.finebodyapp.database.sqlite.entitys.Coach;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+import com.jjsj.finebodyapp.database.firebase.Response;
+import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.repository.Repository;
 
-import java.util.List;
+import java.io.IOException;
 
 public class ViewModelStudents extends AndroidViewModel {
 
     private Repository repository;
-    private LiveData<List<Student>> students;
-    private LiveData<Coach> coach;
+    private LiveData<Response> responseStudents;
+    private LiveData<byte[]> responseImageProfile;
+    private PreferenceLogged preference;
 
     public ViewModelStudents(Application application){
 
         super(application);
         this.repository = Repository.getInstance(application.getApplicationContext());
+        this.preference = new PreferenceLogged(application.getApplicationContext());
     }
 
-    public LiveData<List<Student>> getStudentsViewModel() {
+    public LiveData<Response> observerResponseStudents() {
 
-        return this.students;
+        return this.responseStudents;
     }
 
-    public void getStudents(Coach coach){
+    public void getStudents(){
 
-        this.students = this.repository.getStudentsRepository(coach);
+        this.responseStudents = this.repository.getStudents(this.preference.getPreference());
     }
 
-    public LiveData<Coach> getCoachViewModel() {
+    public LiveData<byte[]> observerResponseImageProfile(){
 
-        return coach;
+        return this.responseImageProfile;
     }
 
-    public void getCoach(){
+    public void getImageProfile(String path) throws IOException {
 
-        this.coach = this.repository.getCoach();
+        this.responseImageProfile = this.repository.downloadPhoto(path);
     }
 
     public void logout(){
 
-        this.repository.deleteDatabaseSQLite(getApplication().getApplicationContext());
-        this.repository.changePreferenceFirstLogin();
-        this.repository.changePreferenceLogged();
+        this.preference.setPreference(null);
     }
 }

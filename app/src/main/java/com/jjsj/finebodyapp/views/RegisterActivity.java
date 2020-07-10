@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import com.jjsj.finebodyapp.R;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelRegister;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -58,12 +60,12 @@ public class RegisterActivity extends AppCompatActivity {
             progressBar.setVisibility(View.VISIBLE);
 
             this.viewModelRegister.doRegister(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
-            this.viewModelRegister.getIdCoach().observe(this, new Observer<String>() {
+            this.viewModelRegister.observerResponseRegister().observe(this, new Observer<Response>() {
                 @Override
-                public void onChanged(String s) {
+                public void onChanged(Response res) {
 
                     progressBar.setVisibility(View.GONE);
-                    if(s == null){
+                    if(res.getStatus() != 200){
 
                         new MaterialAlertDialogBuilder(RegisterActivity.this)
                                 .setTitle(getResources().getString(R.string.TitleAlertRegisterFail))
@@ -71,12 +73,19 @@ public class RegisterActivity extends AppCompatActivity {
                                 .show();
                     }else{
 
-                        viewModelRegister.insertIdCoachInRepository(s);
+                        viewModelRegister.insertIdCoachInPreferences(String.class.cast(res.getObject()));
+                        openActivityStudents();
                         finish();
                     }
                 }
             });
         }
+    }
+
+    private void openActivityStudents(){
+
+        Intent intent = new Intent(this, StudentsActivity.class);
+        startActivity(intent);
     }
 
     private void displayDialog(String title, String message){
@@ -85,13 +94,6 @@ public class RegisterActivity extends AppCompatActivity {
                 .setTitle(title)
                 .setMessage(message)
                 .show();
-    }
-
-    @Override
-    protected void onResume() {
-
-        super.onResume();
-
     }
 
     @Override

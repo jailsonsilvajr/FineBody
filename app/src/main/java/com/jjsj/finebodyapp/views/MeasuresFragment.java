@@ -16,11 +16,14 @@ import android.widget.ProgressBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jjsj.finebodyapp.R;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Measure;
-import com.jjsj.finebodyapp.database.sqlite.entitys.Student;
+
+import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelMeasures;
 import com.jjsj.finebodyapp.views.adapter.MeasuresAdapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MeasuresFragment extends Fragment {
@@ -41,8 +44,7 @@ public class MeasuresFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         Bundle extras = getActivity().getIntent().getExtras();
-        if(extras != null) this.student = (Student) extras.getSerializable("student");
-        else this.student = null;
+        this.student = (Student) extras.getSerializable("student");
 
         this.viewModelMeasures = new ViewModelProvider(this).get(ViewModelMeasures.class);
 
@@ -78,14 +80,18 @@ public class MeasuresFragment extends Fragment {
         super.onResume();
 
         this.progressBar.setVisibility(View.VISIBLE);
-        this.viewModelMeasures.getListMeasures(this.student);
-        this.viewModelMeasures.observerMeasures().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
+        this.viewModelMeasures.getMeasures(this.student.getId());
+        this.viewModelMeasures.observerResponseMeasures().observe(getViewLifecycleOwner(), new Observer<Response>() {
             @Override
-            public void onChanged(List<Measure> measures) {
+            public void onChanged(Response res) {
 
                 progressBar.setVisibility(View.GONE);
-                adapter = new MeasuresAdapter(measures, student);
-                recyclerView.setAdapter(adapter);
+                if(res.getStatus() == 200){
+
+                    List<Measure> measures = (ArrayList) res.getObject();
+                    adapter = new MeasuresAdapter(measures, student, getViewLifecycleOwner());
+                    recyclerView.setAdapter(adapter);
+                }
             }
         });
     }
