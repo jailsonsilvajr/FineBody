@@ -94,7 +94,7 @@ public class ProfileFragment extends Fragment {
             Intent returnIntent = new Intent();
             returnIntent.putExtra("student", getStudent());
             returnIntent.putExtra("position", position);
-            getActivity().setResult(Activity.RESULT_OK, returnIntent);
+            getActivity().setResult(StudentsActivity.RESULT_CODE_UPDATE_STUDENT, returnIntent);
         }else{
 
             super.onActivityResult(requestCode, resultCode, data);

@@ -29,6 +29,8 @@ import java.util.List;
 public class StudentsActivity extends AppCompatActivity {
 
     private static final int REQUEST_UPDATE_STUDENT = 1;
+    public static final int RESULT_CODE_UPDATE_STUDENT = 2;
+    public static final int RESULT_CODE_DELETE_STUDENT = 3;
 
     private ViewModelStudents viewModelStudents;
     private RecyclerView recyclerView;
@@ -134,13 +136,24 @@ public class StudentsActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        if(requestCode == getRequestUpdateStudent() && resultCode == RESULT_OK){
+        if(requestCode == getRequestUpdateStudent()){
 
-            Student updateStudent = (Student) data.getSerializableExtra("student");
-            int position = data.getIntExtra("position", 0);
+            if(resultCode == RESULT_CODE_UPDATE_STUDENT){
 
-            getStudents().set(position, updateStudent);
-            getAdapter().notifyItemChanged(position);
+                Student updateStudent = (Student) data.getSerializableExtra("student");
+                int position = data.getIntExtra("position", 0);
+
+                getStudents().set(position, updateStudent);
+                getAdapter().notifyItemChanged(position);
+            }else if(resultCode == RESULT_CODE_DELETE_STUDENT){
+
+                int position = data.getIntExtra("position", -1);
+                if(position >= 0){
+
+                    getStudents().remove(position);
+                    getAdapter().notifyItemRemoved(position);
+                }
+            }
         }else{
 
             super.onActivityResult(requestCode, resultCode, data);

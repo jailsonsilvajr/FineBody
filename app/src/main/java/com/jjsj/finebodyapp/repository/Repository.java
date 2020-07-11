@@ -14,11 +14,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.firebase.FireRequests;
 import com.jjsj.finebodyapp.database.firebase.Response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class Repository {
 
@@ -95,6 +97,12 @@ public class Repository {
         return fireRequests.deleteOneMeasure(idMeasure);
     }
 
+    public MutableLiveData<Response> deleteAllMeasures(List<Measure> measures){
+
+        FireRequests fireRequests = new FireRequests();
+        return fireRequests.deleteAllMeasure(measures);
+    }
+
     public MutableLiveData<Response> updateMeasure(com.jjsj.finebodyapp.database.entitys.Measure measure){
 
         FireRequests fireRequests = new FireRequests();
@@ -105,6 +113,12 @@ public class Repository {
 
         FireRequests fireRequests = new FireRequests();
         return fireRequests.downloadPhoto(path);
+    }
+
+    public void deleteImg(String path){
+
+        FireRequests fireRequests = new FireRequests();
+        fireRequests.deleteImg(path);
     }
 
     public MutableLiveData<Boolean> uploadPhoto(ImageView imageView, String path){

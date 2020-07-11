@@ -17,6 +17,10 @@
     <string name="MessageAlertRegisterFail">Email já cadastrado</string>
     <string name="error">Error</string>
     <string name="MessageAlertEditProfileFail">Não foi possível salvar</string>
+    <string name="TitleAlertDeleteStudentSuccess">Sucesso!</string>
+    <string name="MessageAlertDeleteStudentSuccess">O aluno foi deletado.</string>
+    <string name="TitleAlertDeleteStudentFail">Falha!</string>
+    <string name="MessageAlertDeleteStudentFail">Não foi possível deletar o aluno.</string>
     <string name="logout">SAIR</string>
     <string name="students">Alunos</string>
     <string name="new_datas">Novos Dados</string>

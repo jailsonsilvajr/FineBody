@@ -339,6 +339,18 @@ public class FireRequests {
         return result;
     }
 
+    public MutableLiveData<Response> deleteAllMeasure(List<Measure> measures){
+
+        MutableLiveData<Response> result = new MutableLiveData<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        for(int i = 0; i < measures.size(); i++){
+
+            db.collection(Measure.nameCollection).document(measures.get(i).getId()).delete();
+        }
+        result.setValue(new Response(200, null, null));
+        return result;
+    }
+
     public MutableLiveData<Response> putOneMeasure(Measure measure){
 
         MutableLiveData<Response> result = new MutableLiveData<>();
@@ -391,6 +403,14 @@ public class FireRequests {
         });
 
         return imgBytes;
+    }
+
+    public void deleteImg(String path){
+
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageReference = firebaseStorage.getReference();
+        StorageReference imgReference = storageReference.child(path);
+        imgReference.delete();
     }
 
     private Map<String, Object> getMapStudent(Student student){
