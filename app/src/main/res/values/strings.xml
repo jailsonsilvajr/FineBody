@@ -15,6 +15,8 @@
     <string name="MessageDifferentPasswords">As senhas não são iguais</string>
     <string name="TitleAlertRegisterFail">Tente novamente</string>
     <string name="MessageAlertRegisterFail">Email já cadastrado</string>
+    <string name="TitleAlertAddStudentFail">Erro!</string>
+    <string name="MessageAlertAddStudentFail">Tenta novamente!</string>
     <string name="error">Error</string>
     <string name="MessageAlertEditProfileFail">Não foi possível salvar</string>
     <string name="TitleAlertDeleteStudentSuccess">Sucesso!</string>
@@ -46,7 +48,7 @@
     <string name="male">Masculino</string>
     <string name="female">Feminino</string>
     <string name="editProfile">Editar Perfil</string>
-    
+
     <string-array name="genres">
         <item>@string/male</item>
         <item>@string/female</item>

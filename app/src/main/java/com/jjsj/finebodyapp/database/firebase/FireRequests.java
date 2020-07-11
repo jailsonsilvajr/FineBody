@@ -171,6 +171,7 @@ public class FireRequests {
                         if(task.isSuccessful()){
 
                             student.setId(task.getResult().getId());
+                            student.setPathPhoto(student.getPathPhoto() + student.getId());
                             Response response = new Response(201, "Created", student);
                             result.setValue(response);
                         }else{

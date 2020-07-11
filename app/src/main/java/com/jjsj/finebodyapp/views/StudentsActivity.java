@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Student;
 import com.jjsj.finebodyapp.database.firebase.Response;
@@ -31,12 +32,14 @@ public class StudentsActivity extends AppCompatActivity {
     private static final int REQUEST_UPDATE_STUDENT = 1;
     public static final int RESULT_CODE_UPDATE_STUDENT = 2;
     public static final int RESULT_CODE_DELETE_STUDENT = 3;
+    private static final int REQUEST_ADD_STUDENT = 4;
 
     private ViewModelStudents viewModelStudents;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
     private ProgressBar progressBar;
+    private FloatingActionButton floatingActionButton;
     private List<Student> students;
 
     @Override
@@ -57,6 +60,20 @@ public class StudentsActivity extends AppCompatActivity {
         this.recyclerView.setHasFixedSize(true);
         this.layoutManager = new LinearLayoutManager(this);
         this.recyclerView.setLayoutManager(this.layoutManager);
+        this.floatingActionButton = findViewById(R.id.layout_students_floatingActionButton);
+        this.floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openActivityAddStudent();
+            }
+        });
+    }
+
+    private void openActivityAddStudent(){
+
+        Intent intent = new Intent(this, AddStudentActivity.class);
+        startActivityForResult(intent, getRequestAddStudent());
     }
 
     private ViewModelStudents getViewModel(){
@@ -154,6 +171,11 @@ public class StudentsActivity extends AppCompatActivity {
                     getAdapter().notifyItemRemoved(position);
                 }
             }
+        }else if(requestCode == getRequestAddStudent() && resultCode == RESULT_OK){
+
+            Student newStudent = (Student) data.getSerializableExtra("student");
+            getStudents().add(newStudent);
+            getAdapter().notifyDataSetChanged();
         }else{
 
             super.onActivityResult(requestCode, resultCode, data);
@@ -163,6 +185,11 @@ public class StudentsActivity extends AppCompatActivity {
     private int getRequestUpdateStudent(){
 
         return this.REQUEST_UPDATE_STUDENT;
+    }
+
+    private int getRequestAddStudent(){
+
+        return REQUEST_ADD_STUDENT;
     }
 
     @Override
