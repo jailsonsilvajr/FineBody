@@ -23,7 +23,12 @@ import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelMeasures;
 import com.jjsj.finebodyapp.views.adapter.MeasuresAdapter;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class MeasuresFragment extends Fragment {
@@ -89,6 +94,24 @@ public class MeasuresFragment extends Fragment {
                 if(res.getStatus() == 200){
 
                     List<Measure> measures = (ArrayList) res.getObject();
+
+                    Collections.sort(measures, new Comparator<Measure>() {
+                        @Override
+                        public int compare(Measure measure, Measure t1) {
+
+                            try {
+
+                                Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(measure.getDate());
+                                Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(t1.getDate());
+                                return date1.compareTo(date2);
+                            } catch (ParseException e) {
+
+                                e.printStackTrace();
+                            }
+                            return 0;
+                        }
+                    });
+
                     adapter = new MeasuresAdapter(measures, student, getViewLifecycleOwner());
                     recyclerView.setAdapter(adapter);
                 }
