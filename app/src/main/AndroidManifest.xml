@@ -34,6 +34,7 @@
             android:name=".views.StudentsActivity"
             android:screenOrientation="portrait" />
         <activity
+            android:theme="@style/AppThemeNoActionBar"
             android:name=".views.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
