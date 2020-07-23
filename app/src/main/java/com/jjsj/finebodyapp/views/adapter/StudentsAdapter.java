@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -50,6 +51,8 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
     @Override
     public void onBindViewHolder(@NonNull final StudentsViewHolder holder, final int position) {
 
+        holder.getProgressBar().setVisibility(View.VISIBLE);
+        holder.getImageView().setVisibility(View.GONE);
         holder.getTextView().setText(getStudents().get(position).getName());
         try {//get img profile
 
@@ -69,6 +72,8 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
 
                         holder.getImageView().setImageResource(R.drawable.boy);
                     }
+                    holder.getImageView().setVisibility(View.VISIBLE);
+                    holder.getProgressBar().setVisibility(View.GONE);
                 }
             });
         } catch (IOException e) {
@@ -119,6 +124,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
 
         public TextView textView;
         public ImageView imageView;
+        public ProgressBar progressBar;
         public View view;
         public Context context;
 
@@ -128,6 +134,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
 
             setTextView(itemView.findViewById(R.id.layout_students_item_textView));
             setImageView(itemView.findViewById(R.id.layout_students_item_imageView));
+            setProgressBar(itemView.findViewById(R.id.layout_students_item_progressBar));
             setView(itemView);
             setContext(context);
             getView().setOnClickListener(new View.OnClickListener() {
@@ -160,6 +167,14 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
         public void setImageView(ImageView imageView) {
 
             this.imageView = imageView;
+        }
+
+        public ProgressBar getProgressBar() {
+            return progressBar;
+        }
+
+        public void setProgressBar(ProgressBar progressBar) {
+            this.progressBar = progressBar;
         }
 
         public View getView() {
