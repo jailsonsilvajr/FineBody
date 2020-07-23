@@ -35,9 +35,7 @@ public class GraphsFragment extends Fragment {
     private Student student;
 
     private ProgressBar progressBar;
-    private WebView webViewWeight;
-    private WebView webViewArm;
-    private WebView webViewWaist;
+    private WebView webView;
 
     private List<Measure> measures;
 
@@ -55,17 +53,11 @@ public class GraphsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_graphs, container, false);
 
         this.progressBar = view.findViewById(R.id.fragment_graph_progressBar);
-        this.webViewWeight = view.findViewById(R.id.webView_weight);
-        this.webViewArm = view.findViewById(R.id.webView_arm);
-        this.webViewWaist = view.findViewById(R.id.webView_waist);
+        this.webView = view.findViewById(R.id.webView);
 
-        this.webViewWeight.addJavascriptInterface(new WebAppInterface(), "Android");
-        this.webViewArm.addJavascriptInterface(new WebAppInterface(), "Android");
-        this.webViewWaist.addJavascriptInterface(new WebAppInterface(), "Android");
+        this.webView.addJavascriptInterface(new WebAppInterface(), "Android");
 
-        this.webViewWeight.getSettings().setJavaScriptEnabled(true);
-        this.webViewArm.getSettings().setJavaScriptEnabled(true);
-        this.webViewWaist.getSettings().setJavaScriptEnabled(true);
+        this.webView.getSettings().setJavaScriptEnabled(true);
 
         return view;
     }
@@ -75,9 +67,7 @@ public class GraphsFragment extends Fragment {
 
         super.onResume();
 
-        this.webViewWeight.setVisibility(View.GONE);
-        this.webViewArm.setVisibility(View.GONE);
-        this.webViewWaist.setVisibility(View.GONE);
+        this.webView.setVisibility(View.GONE);
         this.progressBar.setVisibility(View.VISIBLE);
         this.viewModelGraph.getMeasures(this.student.getId());
         this.viewModelGraph.observerResponseMeasures().observe(getViewLifecycleOwner(), new Observer<Response>() {
@@ -92,7 +82,7 @@ public class GraphsFragment extends Fragment {
                         public int compare(Measure measure, Measure t1) {
 
                             try {
-
+                                //sort
                                 Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(measure.getDate());
                                 Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(t1.getDate());
                                 return date1.compareTo(date2);
@@ -103,13 +93,10 @@ public class GraphsFragment extends Fragment {
                             return 0;
                         }
                     });
-                    webViewWeight.loadUrl("file:///android_asset/weight_column_chart.html");
-                    webViewArm.loadUrl("file:///android_asset/arm_line_chart.html");
-                    webViewWaist.loadUrl("file:///android_asset/waist_line_chart.html");
 
-                    webViewWeight.setVisibility(View.VISIBLE);
-                    webViewArm.setVisibility(View.VISIBLE);
-                    webViewWaist.setVisibility(View.VISIBLE);
+                    webView.loadUrl("file:///android_asset/webView.html");
+
+                    webView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                 }
             }
@@ -119,7 +106,7 @@ public class GraphsFragment extends Fragment {
     public class WebAppInterface{
 
         @JavascriptInterface
-        public int getLengthMeasures(){
+        public int getSizeMeasures(){
 
             return measures.size();
         }
@@ -152,6 +139,24 @@ public class GraphsFragment extends Fragment {
         public float getWaist(int i){
 
             return measures.get(i).getWaist();
+        }
+
+        @JavascriptInterface
+        public float getHip(int i){
+
+            return measures.get(i).getHip();
+        }
+
+        @JavascriptInterface
+        public float getRightCalf(int i){
+
+            return measures.get(i).getRightCalf();
+        }
+
+        @JavascriptInterface
+        public float getLeftCalf(int i){
+
+            return measures.get(i).getLeftCalf();
         }
     }
 }

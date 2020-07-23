@@ -1,0 +1,133 @@
+<html>
+    <head>
+        <!--Load the AJAX API-->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+
+            // Load the Visualization API and the corechart package.
+            google.charts.load('current', {'packages':['corechart']});
+
+            // Set a callback to run when the Google Visualization API is loaded.
+            google.charts.setOnLoadCallback(drawChart);
+
+            // Callback that creates and populates a data table,
+            // instantiates the pie chart, passes in the data and
+            // draws it.
+            function drawChart() {
+
+
+
+                // Create the data table:
+                var size = Android.getSizeMeasures();
+
+                //Weight
+                var arrayGraphWeight = [];
+                arrayGraphWeight.push(['Date', 'Weight']);
+                for(i = 0; i < size; i++){
+                    arrayGraphWeight.push([Android.getDate(i), Android.getWeight(i)]);
+                }
+                var dataGraphWeight = new google.visualization.arrayToDataTable(arrayGraphWeight);
+
+                //Arms
+                var arrayGraphArm = [];
+                arrayGraphArm.push(['Date', 'Right', 'Left']);
+                for(i = 0; i < size; i++){
+                    arrayGraphArm.push([Android.getDate(i), Android.getRightArm(i), Android.getLeftArm(i)]);
+                }
+                var dataGraphArm = new google.visualization.arrayToDataTable(arrayGraphArm);
+
+                //Waist
+                var arrayGraphWaist = [];
+                arrayGraphWaist.push(['Date', 'Waist']);
+                for(i = 0; i < size; i++){
+                    arrayGraphWaist.push([Android.getDate(i), Android.getWaist(i)]);
+                }
+                var dataGraphWaist = new google.visualization.arrayToDataTable(arrayGraphWaist);
+
+                //Hip
+                var arrayGraphHip = [];
+                arrayGraphHip.push(['Date', 'Hip']);
+                for(i = 0; i < size; i++){
+                    arrayGraphHip.push([Android.getDate(i), Android.getHip(i)]);
+                }
+                var dataGraphHip = new google.visualization.arrayToDataTable(arrayGraphHip);
+
+                //Calfs
+                var arrayGraphCalf = [];
+                arrayGraphCalf.push(['Date', 'Right', 'Left']);
+                for(i = 0; i < size; i++){
+                    arrayGraphCalf.push([Android.getDate(i), Android.getRightCalf(i), Android.getLeftCalf(i)]);
+                }
+                var dataGraphCalf = new google.visualization.arrayToDataTable(arrayGraphCalf);
+
+
+                //Options:
+
+                //Weight
+                var optionsWeight = {title:'Weight',
+                               curveType:'none',
+                               legend: {position: 'bottom'}
+                };
+
+                //Arm
+                var optionsArm = {title:'Arm',
+                               curveType:'none',
+                               legend: {position: 'bottom'}
+                };
+
+                //Waist
+                var optionsWaist = {title:'Waist',
+                               curveType:'none',
+                               legend: {position: 'bottom'}
+                };
+
+                //Hip
+                var optionsHip = {title:'Hip',
+                               curveType:'none',
+                               legend: {position: 'bottom'}
+                };
+
+                //Calf
+                var optionsCalf = {title:'Calf',
+                               curveType:'none',
+                               legend: {position: 'bottom'}
+                };
+
+                // Instantiate and draw our chart, passing in some options:
+
+                //Weight
+                var weight_chart = new google.visualization.LineChart(document.getElementById('weight_chart_div'));
+                weight_chart.draw(dataGraphWeight, optionsWeight);
+
+                //Arm
+                var arm_chart = new google.visualization.LineChart(document.getElementById('arm_chart_div'));
+                arm_chart.draw(dataGraphArm, optionsArm);
+
+                //Waits
+                var waist_chart = new google.visualization.LineChart(document.getElementById('waist_chart_div'));
+                waist_chart.draw(dataGraphWaist, optionsWaist);
+
+                //Hip
+                var hip_chart = new google.visualization.LineChart(document.getElementById('hip_chart_div'));
+                hip_chart.draw(dataGraphHip, optionsHip);
+
+                //Calf
+                var calf_chart = new google.visualization.LineChart(document.getElementById('calf_chart_div'));
+                calf_chart.draw(dataGraphCalf, optionsCalf);
+            }
+        </script>
+    </head>
+
+    <body>
+    <!--Div that will hold the pie chart-->
+        <div id="weight_chart_div"></div>
+        <br>
+        <div id="arm_chart_div"></div>
+        <br>
+        <div id="waist_chart_div"></div>
+        <br>
+        <div id="hip_chart_div"></div>
+        <br>
+        <div id="calf_chart_div"></div>
+    </body>
+</html>
