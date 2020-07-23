@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -26,9 +25,6 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); //Show button
-        getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         this.viewModelRegister = new ViewModelProvider(this).get(ViewModelRegister.class);
 
@@ -94,17 +90,5 @@ public class RegisterActivity extends AppCompatActivity {
                 .setTitle(title)
                 .setMessage(message)
                 .show();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int id = item.getItemId();
-        if(id == android.R.id.home){
-
-            onBackPressed();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }
