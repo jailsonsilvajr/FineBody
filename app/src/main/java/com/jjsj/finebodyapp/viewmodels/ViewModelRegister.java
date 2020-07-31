@@ -1,39 +1,41 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
-
-import androidx.lifecycle.AndroidViewModel;
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.jjsj.finebodyapp.database.firebase.Response;
-import com.jjsj.finebodyapp.preferences.PreferenceLogged;
-import com.jjsj.finebodyapp.repository.Repository;
 
-public class ViewModelRegister extends AndroidViewModel {
+public class ViewModelRegister extends ViewModel {
 
-    private LiveData<Response> responseRegister;
-    private Repository repository;
-    private PreferenceLogged preference;
+    private MutableLiveData<Response> mutableLiveDataResponseRegister;
 
-    public ViewModelRegister(Application application){
+    public LiveData<Response> getLiveDataResponseRegister() {
 
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
-        this.preference = new PreferenceLogged(application.getApplicationContext());
-    }
-
-    public LiveData<Response> observerResponseRegister() {
-
-        return this.responseRegister;
+        if(this.mutableLiveDataResponseRegister == null) this.mutableLiveDataResponseRegister = new MutableLiveData<Response>();
+        return this.mutableLiveDataResponseRegister;
     }
 
     public void doRegister(String email, String password){
 
-        this.responseRegister = this.repository.register(email, password);
-    }
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
 
-    public void insertIdCoachInPreferences(String idCoach){
+                        if(task.isSuccessful()){
 
-        this.preference.setPreference(idCoach);
+                            mutableLiveDataResponseRegister.setValue(new Response(200, "OK", task.getResult().getUser().getUid()));
+                        }else{
+
+                            mutableLiveDataResponseRegister.setValue(new Response(409, task.getException().toString(), null));
+                        }
+                    }
+                });
     }
 }
