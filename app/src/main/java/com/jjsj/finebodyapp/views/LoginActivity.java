@@ -11,16 +11,20 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.textfield.TextInputEditText;
 
+import com.google.android.material.textfield.TextInputEditText;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.firebase.Response;
+import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.viewmodels.ViewModelLogin;
 
 public class LoginActivity extends AppCompatActivity {
 
     private ViewModelLogin viewModelLogin;
 
+    private ProgressBar progressBar;
+    private TextInputEditText textInputLayout_email;
+    private TextInputEditText textInputLayout_password;
     private Button buttonEnter;
     private Button buttonRegister;
 
@@ -29,7 +33,11 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        this.viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+        this.progressBar = findViewById(R.id.layout_login_progressBar);
+        this.progressBar.setVisibility(View.GONE);
+
+        this.textInputLayout_email = findViewById(R.id.layout_login_textInput_email);
+        this.textInputLayout_password = findViewById(R.id.layout_login_textInput_password);
 
         this.buttonEnter = findViewById(R.id.layout_login_button_enter);
         this.buttonRegister = findViewById(R.id.layout_login_button_register);
@@ -49,14 +57,33 @@ public class LoginActivity extends AppCompatActivity {
                 openActivityRegister();
             }
         });
+
+        this.viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
+        this.viewModelLogin.getLiveDataResponseLogin().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(Response response) {
+
+                progressBar.setVisibility(View.GONE);
+                if(response.getStatus() != 200){
+
+                    new MaterialAlertDialogBuilder(LoginActivity.this)
+                            .setTitle(getResources().getString(R.string.TitleAlertLoginFail))
+                            .setMessage(getResources().getString(R.string.MessageAlertLoginFail))
+                            .show();
+                }else{
+                    insertIdCoachInPreferences(String.class.cast(response.getObject()));
+                    openActivityStudents();
+                }
+            }
+        });
     }
 
     private void doLogin(){
 
-        TextInputEditText textInputEditTextEmail = findViewById(R.id.layout_login_textInput_email);
-        TextInputEditText textInputEditTextPassword = findViewById(R.id.layout_login_textInput_password);
+        String email = this.textInputLayout_email.getText().toString();
+        String password = this.textInputLayout_password.getText().toString();
 
-        if(textInputEditTextEmail.getText().toString().isEmpty() || textInputEditTextPassword.getText().toString().isEmpty()){
+        if(email.isEmpty() || password.isEmpty()){
 
             new MaterialAlertDialogBuilder(this)
                     .setTitle(getResources().getString(R.string.TitleAlertEmailOrPasswordInvalid))
@@ -64,29 +91,8 @@ public class LoginActivity extends AppCompatActivity {
                     .show();
         }else{
 
-            final ProgressBar progressBar = findViewById(R.id.layout_login_progressBar);
-            progressBar.setVisibility(View.VISIBLE);
-
-            this.viewModelLogin.doLogin(textInputEditTextEmail.getText().toString(), textInputEditTextPassword.getText().toString());
-            this.viewModelLogin.observerResponseLogin().observe(this, new Observer<Response>() {
-                @Override
-                public void onChanged(Response res) {
-
-                    progressBar.setVisibility(View.GONE);
-
-                    if(res.getStatus() != 200){
-
-                        new MaterialAlertDialogBuilder(LoginActivity.this)
-                                .setTitle(getResources().getString(R.string.TitleAlertLoginFail))
-                                .setMessage(getResources().getString(R.string.MessageAlertLoginFail))
-                                .show();
-                    }else{
-
-                        viewModelLogin.insertIdCoachInPreferences(String.class.cast(res.getObject()));
-                        openActivityStudents();
-                    }
-                }
-            });
+            this.progressBar.setVisibility(View.VISIBLE);
+            this.viewModelLogin.doLogin(email, password);
         }
     }
 
@@ -101,5 +107,11 @@ public class LoginActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
+    }
+
+    private void insertIdCoachInPreferences(String idCoach){
+
+        PreferenceLogged preferenceLogged = new PreferenceLogged(this);
+        preferenceLogged.setPreference(idCoach);
     }
 }

@@ -37,12 +37,6 @@ public class Repository {
         return repository;
     }
 
-    public MutableLiveData<Response> login(String email, String password){
-
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.loginCoach(email, password);
-    }
-
     public MutableLiveData<Response> register(String email, String password){
 
         FireRequests fireRequests = new FireRequests();

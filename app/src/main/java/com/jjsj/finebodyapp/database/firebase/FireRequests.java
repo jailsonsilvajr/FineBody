@@ -28,30 +28,6 @@ import java.util.Map;
 
 public class FireRequests {
 
-    public MutableLiveData<Response> loginCoach(String email, String password){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
-
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        if(task.isSuccessful()){
-
-                            Response response = new Response(200, "OK", task.getResult().getUser().getUid());
-                            result.setValue(response);
-                        }else{
-
-                            Response response = new Response(401, task.getException().toString(), null);
-                            result.setValue(response);
-                        }
-                    }
-                });
-
-        return result;
-    }
-
     public MutableLiveData<Response> registerCoach(String email, String password){
 
         MutableLiveData<Response> result = new MutableLiveData<>();
