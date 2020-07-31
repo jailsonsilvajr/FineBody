@@ -38,8 +38,7 @@
             android:name=".views.LoginActivity" />
         <activity
             android:theme="@style/AppThemeNoActionBar"
-            android:name=".views.RegisterActivity"
-            android:screenOrientation="portrait" />
+            android:name=".views.RegisterActivity" />
 
         <meta-data
             android:name="preloaded_fonts"
