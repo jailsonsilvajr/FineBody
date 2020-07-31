@@ -1,6 +1,7 @@
 package com.jjsj.finebodyapp.views;
 
 import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -93,7 +94,6 @@ public class GraphsFragment extends Fragment {
                             return 0;
                         }
                     });
-
                     webView.loadUrl("file:///android_asset/webView.html");
 
                     webView.setVisibility(View.VISIBLE);
