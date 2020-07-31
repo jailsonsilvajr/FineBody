@@ -57,7 +57,7 @@ public class StudentsAdapter extends RecyclerView.Adapter<StudentsAdapter.Studen
         try {//get img profile
 
             getViewModelStudents().getImageProfile(students.get(position).getPathPhoto());
-            getViewModelStudents().getMutableLiveDataImageProfile().observe(getLifecycleOwner(), new Observer<byte[]>() {
+            getViewModelStudents().getLiveDataImageProfile().observe(getLifecycleOwner(), new Observer<byte[]>() {
                 @Override
                 public void onChanged(byte[] bytes) {
 

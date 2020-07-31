@@ -24,7 +24,7 @@ import java.util.List;
 public class ViewModelStudents extends ViewModel {
 
     private MutableLiveData<Response> mutableLiveDataResponse;
-    private MutableLiveData<byte[]> mutableLiveDataImageProfile;
+    private LiveData<byte[]> liveDataImageProfile;
 
     public LiveData<Response> getMutableLiveDataResponse() {
 
@@ -32,10 +32,9 @@ public class ViewModelStudents extends ViewModel {
         return this.mutableLiveDataResponse;
     }
 
-    public LiveData<byte[]> getMutableLiveDataImageProfile(){
+    public LiveData<byte[]> getLiveDataImageProfile(){
 
-        if(this.mutableLiveDataImageProfile == null) this.mutableLiveDataImageProfile = new MutableLiveData<>();
-        return this.mutableLiveDataImageProfile;
+        return this.liveDataImageProfile;
     }
 
     public void getStudents(String idCoach){
@@ -75,6 +74,13 @@ public class ViewModelStudents extends ViewModel {
 
     public void getImageProfile(String path) throws IOException {
 
+        this.liveDataImageProfile = downloadPhoto(path);
+    }
+
+    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
+
+        MutableLiveData<byte[]> imgBytes = new MutableLiveData<>();
+
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference storageReference = firebaseStorage.getReference();
         StorageReference imgReference = storageReference.child(path);
@@ -84,14 +90,16 @@ public class ViewModelStudents extends ViewModel {
             @Override
             public void onSuccess(byte[] bytes) {
 
-                mutableLiveDataImageProfile.setValue(bytes);
+                imgBytes.setValue(bytes);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                mutableLiveDataImageProfile.setValue(null);
+                imgBytes.setValue(null);
             }
         });
+
+        return imgBytes;
     }
 }
