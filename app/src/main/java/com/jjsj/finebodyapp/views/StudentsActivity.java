@@ -16,11 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Student;
 import com.jjsj.finebodyapp.database.firebase.Response;
+import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.viewmodels.ViewModelStudents;
 import com.jjsj.finebodyapp.views.adapter.StudentsAdapter;
 
@@ -29,10 +29,8 @@ import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity {
 
-    private static final int REQUEST_UPDATE_STUDENT = 1;
-    public static final int RESULT_CODE_UPDATE_STUDENT = 2;
-    public static final int RESULT_CODE_DELETE_STUDENT = 3;
-    private static final int REQUEST_ADD_STUDENT = 4;
+    private static final int REQUEST_ACTIVITY_STUDENT = 1;
+    private static final int REQUEST_ACTIVITY_ADD_STUDENT = 2;
 
     private ViewModelStudents viewModelStudents;
     private RecyclerView recyclerView;
@@ -40,7 +38,6 @@ public class StudentsActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private ProgressBar progressBar;
     private FloatingActionButton floatingActionButton;
-    private List<Student> students;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,18 +45,16 @@ public class StudentsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_students);
 
         getSupportActionBar().setTitle(getResources().getString(R.string.students));
-        setupLayout();
-        setViewModel();
-        getStudentsInDatabase();
-    }
-
-    private void setupLayout(){
 
         this.progressBar = findViewById(R.id.layout_students_progressBar);
+        this.progressBar.setVisibility(View.VISIBLE);
+
         this.recyclerView = findViewById(R.id.layout_students_recyclerView);
+        this.recyclerView.setVisibility(View.GONE);
         this.recyclerView.setHasFixedSize(true);
         this.layoutManager = new LinearLayoutManager(this);
         this.recyclerView.setLayoutManager(this.layoutManager);
+
         this.floatingActionButton = findViewById(R.id.layout_students_floatingActionButton);
         this.floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,128 +63,43 @@ public class StudentsActivity extends AppCompatActivity {
                 openActivityAddStudent();
             }
         });
+
+        this.viewModelStudents = new ViewModelProvider(this).get(ViewModelStudents.class);
+        this.viewModelStudents.getMutableLiveDataResponse().observe(this, new Observer<Response>() {
+            @Override
+            public void onChanged(Response response) {
+
+                progressBar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+
+                if(response.getStatus() == 302){
+
+                    List<Student> students = (ArrayList) response.getObject();
+                    adapter = new StudentsAdapter(students, viewModelStudents, StudentsActivity.this, REQUEST_ACTIVITY_STUDENT);
+                    recyclerView.setAdapter(adapter);
+                }else{
+
+
+                }
+            }
+        });
+        this.viewModelStudents.getStudents(new PreferenceLogged(this).getPreference());
     }
 
     private void openActivityAddStudent(){
 
         Intent intent = new Intent(this, AddStudentActivity.class);
-        startActivityForResult(intent, getRequestAddStudent());
-    }
-
-    private ViewModelStudents getViewModel(){
-
-        return this.viewModelStudents;
-    }
-
-    private void setViewModel(){
-
-        this.viewModelStudents = new ViewModelProvider(this).get(ViewModelStudents.class);
-    }
-
-    //Search all students:
-    private void getStudentsInDatabase(){
-
-        showProgressBar(true);
-        showRecyclerView(false);
-
-        getViewModel().getStudents();
-        getViewModel().observerResponseStudents().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(Response res) {
-
-                showProgressBar(false);
-                showRecyclerView(true);
-                if(res.getStatus() == 302){
-
-                    setStudents((ArrayList) res.getObject());
-                    setAdapter();
-                    setRecyclerViewAdapter();
-                }else{
-
-                    new MaterialAlertDialogBuilder(StudentsActivity.this)
-                            .setTitle(getResources().getString(R.string.error))
-                            .setMessage(res.getMessage())
-                            .show();
-                }
-            }
-        });
-    }
-
-    private void showProgressBar(boolean show){
-
-        this.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    private void showRecyclerView(boolean show){
-
-        this.recyclerView.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    private List<Student> getStudents(){
-
-        return this.students;
-    }
-
-    private void setStudents(List<Student> students){
-
-        this.students = students;
-    }
-
-    private RecyclerView.Adapter getAdapter(){
-
-        return this.adapter;
-    }
-
-    private void setAdapter(){
-
-        this.adapter = new StudentsAdapter(getStudents(), getViewModel(), this, REQUEST_UPDATE_STUDENT);
-    }
-
-    private void setRecyclerViewAdapter(){
-
-        this.recyclerView.setAdapter(getAdapter());
+        startActivityForResult(intent, REQUEST_ACTIVITY_ADD_STUDENT);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-        if(requestCode == getRequestUpdateStudent()){
+        super.onActivityResult(requestCode, resultCode, data);
+        if((requestCode == REQUEST_ACTIVITY_ADD_STUDENT || requestCode == REQUEST_ACTIVITY_STUDENT) && resultCode == RESULT_OK){
 
-            if(resultCode == RESULT_CODE_UPDATE_STUDENT){
-
-                Student updateStudent = (Student) data.getSerializableExtra("student");
-                int position = data.getIntExtra("position", 0);
-
-                getStudents().set(position, updateStudent);
-                getAdapter().notifyItemChanged(position);
-            }else if(resultCode == RESULT_CODE_DELETE_STUDENT){
-
-                int position = data.getIntExtra("position", -1);
-                if(position >= 0){
-
-                    getStudents().remove(position);
-                    getAdapter().notifyItemRemoved(position);
-                }
-            }
-        }else if(requestCode == getRequestAddStudent() && resultCode == RESULT_OK){
-
-            Student newStudent = (Student) data.getSerializableExtra("student");
-            getStudents().add(newStudent);
-            getAdapter().notifyDataSetChanged();
-        }else{
-
-            super.onActivityResult(requestCode, resultCode, data);
+            this.viewModelStudents.getStudents(new PreferenceLogged(this).getPreference());
         }
-    }
-
-    private int getRequestUpdateStudent(){
-
-        return this.REQUEST_UPDATE_STUDENT;
-    }
-
-    private int getRequestAddStudent(){
-
-        return REQUEST_ADD_STUDENT;
     }
 
     @Override
@@ -213,7 +123,7 @@ public class StudentsActivity extends AppCompatActivity {
 
     private void doLogout(){
 
-        getViewModel().logout();
+        new PreferenceLogged(this).setPreference(null);
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
         finish();

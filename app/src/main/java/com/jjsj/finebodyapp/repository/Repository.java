@@ -43,12 +43,6 @@ public class Repository {
         return fireRequests.getOneStudent(idStudent);
     }
 
-    public MutableLiveData<Response> getStudents(String idCoach){
-
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.getAllStudent(idCoach);
-    }
-
     public MutableLiveData<Response> insertStudent(com.jjsj.finebodyapp.database.entitys.Student student){
 
         FireRequests fireRequests = new FireRequests();

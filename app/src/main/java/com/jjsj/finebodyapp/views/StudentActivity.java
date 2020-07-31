@@ -145,7 +145,7 @@ public class StudentActivity extends AppCompatActivity {
 
                     Intent intent = new Intent();
                     intent.putExtra("position", position);
-                    setResult(StudentsActivity.RESULT_CODE_DELETE_STUDENT, intent);
+                    setResult(RESULT_OK, intent);
 
                     getViewModelStudent().deleteImg(student.getPathPhoto());
                     finish();
