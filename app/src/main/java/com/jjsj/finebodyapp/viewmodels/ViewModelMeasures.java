@@ -1,32 +1,100 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-import com.jjsj.finebodyapp.database.firebase.Response;
-import com.jjsj.finebodyapp.repository.Repository;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.jjsj.finebodyapp.database.entitys.Measure;
 
-public class ViewModelMeasures extends AndroidViewModel {
+import java.util.ArrayList;
+import java.util.List;
 
-    private Repository repository;
-    private LiveData<Response> responseMeasures;
+public class ViewModelMeasures extends ViewModel {
 
-    public ViewModelMeasures(@NonNull Application application) {
+    private String idStudent;
+    private MutableLiveData<List<Measure>> measures;
 
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
+    public void setIdStudent(String idStudent){
+
+        this.idStudent = idStudent;
     }
 
-    public LiveData<Response> observerResponseMeasures(){
+    public LiveData<List<Measure>> observerMeasures(){
 
-        return this.responseMeasures;
+        if(this.measures == null) this.measures = new MutableLiveData<>();
+        return this.measures;
     }
 
-    public void getMeasures(String idStudent){
+    public Measure getOneMeasure(int position){
 
-        this.responseMeasures = this.repository.getMeasures(idStudent);
+        return this.measures.getValue().get(position);
+    }
+
+    public void getMeasures(){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Measure.nameCollection)
+                .whereEqualTo(Measure.nameFieldIdStudent, this.idStudent)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+
+                        if(task.isSuccessful()){
+
+                            List<Measure> listMeasure = new ArrayList<>();
+                            for(QueryDocumentSnapshot document : task.getResult()){
+
+                                Measure measure = new Measure();
+                                measure.setId(document.getId());
+                                measure.setIdStudent(document.get(Measure.nameFieldIdStudent).toString());
+                                measure.setDate(document.get(Measure.nameFieldDate).toString());
+                                measure.setWeight(Float.parseFloat(document.get(Measure.nameFieldWeight).toString()));
+                                measure.setRightArm(Float.parseFloat(document.get(Measure.nameFieldRightArm).toString()));
+                                measure.setLeftArm(Float.parseFloat(document.get(Measure.nameFieldLeftArm).toString()));
+                                measure.setWaist(Float.parseFloat(document.get(Measure.nameFieldWaist).toString()));
+                                measure.setHip(Float.parseFloat(document.get(Measure.nameFieldHip).toString()));
+                                measure.setRightCalf(Float.parseFloat(document.get(Measure.nameFieldRightCalf).toString()));
+                                measure.setLeftCalf(Float.parseFloat(document.get(Measure.nameFieldLeftCalf).toString()));
+
+                                listMeasure.add(measure);
+                            }
+                            measures.setValue(listMeasure);
+                        }else{
+
+
+                        }
+                    }
+                });
+    }
+
+    public void deleteMeasure(String idMeasure){
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Measure.nameCollection)
+                .document(idMeasure)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        getMeasures();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+
+                    }
+                });
     }
 }

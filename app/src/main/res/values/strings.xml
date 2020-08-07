@@ -48,6 +48,9 @@
     <string name="male">Masculino</string>
     <string name="female">Feminino</string>
     <string name="editProfile">Editar Perfil</string>
+    <string name="question_delete">Deletar?</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
 
     <string-array name="genres">
         <item>@string/male</item>

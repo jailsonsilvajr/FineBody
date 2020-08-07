@@ -21,7 +21,6 @@ import com.jjsj.finebodyapp.viewmodels.ViewModelEditMeasure;
 
 public class EditMeasureActivity extends AppCompatActivity {
 
-    private Student student;
     private Measure measure;
     private TextInputLayout textInputLayout_date;
     private TextInputLayout textInputLayout_weight;
@@ -47,7 +46,6 @@ public class EditMeasureActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         Bundle extras = getIntent().getExtras();
-        this.student = (Student) extras.getSerializable("student");
         this.measure = (Measure) extras.getSerializable("measure");
 
         this.textInputLayout_date = findViewById(R.id.layout_edit_measures_textInput_date);
@@ -94,7 +92,7 @@ public class EditMeasureActivity extends AppCompatActivity {
 
         Measure newMeasure = new Measure();
         newMeasure.setId(this.measure.getId());
-        newMeasure.setIdStudent(this.student.getId());
+        newMeasure.setIdStudent(this.measure.getIdStudent());
 
         newMeasure.setDate(this.textInputLayout_date.getEditText().getText().toString());
         newMeasure.setWeight(Float.parseFloat(this.textInputLayout_weight.getEditText().getText().toString()));
@@ -110,7 +108,11 @@ public class EditMeasureActivity extends AppCompatActivity {
             @Override
             public void onChanged(Response res) {
 
-                if(res.getStatus() == 200) finish();
+                if(res.getStatus() == 200) {
+
+                    setResult(RESULT_OK);
+                    finish();
+                }
                 else{
 
                     progressBar.setVisibility(View.GONE);

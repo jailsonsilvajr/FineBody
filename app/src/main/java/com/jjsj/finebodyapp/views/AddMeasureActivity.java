@@ -94,6 +94,7 @@ public class AddMeasureActivity extends AppCompatActivity {
                 if(res.getStatus() == 200){
 
                     viewModelAddMeasures.updateMeasure(Measure.class.cast(res.getObject()));//insert id in firebase
+                    setResult(RESULT_OK);
                     finish();
                 }
                 else{
