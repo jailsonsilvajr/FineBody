@@ -1,38 +1,44 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
-
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jjsj.finebodyapp.database.entitys.Measure;
-import com.jjsj.finebodyapp.database.firebase.Response;
-import com.jjsj.finebodyapp.repository.Repository;
 
-public class ViewModelAddMeasure extends AndroidViewModel {
+public class ViewModelAddMeasure extends ViewModel {
 
-    private LiveData<Response> responseMeasure;
-    private Repository repository;
+    private MutableLiveData<Measure> measure;
 
-    public ViewModelAddMeasure(@NonNull Application application) {
+    public LiveData<Measure> observerMeasure(){
 
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
-    }
-
-    public LiveData<Response> observerResponseMeasure(){
-
-        return this.responseMeasure;
+        if(this.measure == null) this.measure = new MutableLiveData<>();
+        return this.measure;
     }
 
     public void addMeasure(Measure newMeasure){
 
-        this.responseMeasure = repository.insertMeasure(newMeasure);
-    }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Measure.nameCollection)
+                .add(newMeasure)
+                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentReference> task) {
 
-    public void updateMeasure(Measure measure){
+                        if(task.isSuccessful()){
 
-        this.repository.updateMeasure(measure);
+                            newMeasure.setId(task.getResult().getId());
+                            measure.setValue(newMeasure);
+                        }else{
+
+                            measure.setValue(null);
+                        }
+                    }
+                });
     }
 }

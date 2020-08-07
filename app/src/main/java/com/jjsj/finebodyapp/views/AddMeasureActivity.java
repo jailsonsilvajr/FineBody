@@ -5,20 +5,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelAddMeasure;
 
 public class AddMeasureActivity extends AppCompatActivity {
+
+    private final String KEY_NEW_MEASURE = "com.jjsj.finebodyapp.new_measure";
 
     private Student student;
     private TextInputLayout textInputLayout_date;
@@ -64,9 +67,27 @@ public class AddMeasureActivity extends AppCompatActivity {
             }
         });
         this.progressBar = findViewById(R.id.layout_add_measures_progressBar);
-        this.progressBar.setVisibility(View.GONE);
 
         this.viewModelAddMeasures = new ViewModelProvider(this).get(ViewModelAddMeasure.class);
+        this.viewModelAddMeasures.observerMeasure().observe(this, new Observer<Measure>() {
+            @Override
+            public void onChanged(Measure newMeasure) {
+
+                if(newMeasure != null){
+
+                    Intent intent = new Intent();
+                    intent.putExtra(KEY_NEW_MEASURE, newMeasure);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }else{
+
+                    new MaterialAlertDialogBuilder(AddMeasureActivity.this)
+                            .setTitle(getResources().getString(R.string.TitleAlertAddMeasureFail))
+                            .setMessage(getResources().getString(R.string.MessageAlertAddMeasureFail))
+                            .show();
+                }
+            }
+        });
     }
 
     private void saveMeasure(){
@@ -87,23 +108,6 @@ public class AddMeasureActivity extends AppCompatActivity {
         measure.setLeftCalf(Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString()));
 
         this.viewModelAddMeasures.addMeasure(measure);
-        this.viewModelAddMeasures.observerResponseMeasure().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(Response res) {
-
-                if(res.getStatus() == 200){
-
-                    viewModelAddMeasures.updateMeasure(Measure.class.cast(res.getObject()));//insert id in firebase
-                    setResult(RESULT_OK);
-                    finish();
-                }
-                else{
-
-                    progressBar.setVisibility(View.GONE);
-                    button_save.setVisibility(View.VISIBLE);
-                }
-            }
-        });
     }
 
     @Override

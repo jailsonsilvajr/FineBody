@@ -37,6 +37,8 @@ import java.util.List;
 
 public class MeasuresFragment extends Fragment {
 
+    private final String KEY_NEW_MEASURE = "com.jjsj.finebodyapp.new_measure";
+
     private final int REQUEST_EDIT_MEASURE = 0;
     private final int REQUEST_ADD_MEASURE = 1;
 
@@ -47,6 +49,8 @@ public class MeasuresFragment extends Fragment {
 
     private Student student;
     private ViewModelMeasures viewModelMeasures;
+
+    private List<Measure> measures;
 
     public MeasuresFragment() {}
 
@@ -108,8 +112,9 @@ public class MeasuresFragment extends Fragment {
         this.viewModelMeasures.setIdStudent(this.student.getId());
         this.viewModelMeasures.observerMeasures().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
             @Override
-            public void onChanged(List<Measure> measures) {
+            public void onChanged(List<Measure> newMeasures) {
 
+                measures = newMeasures;
                 progressBar.setVisibility(View.GONE);
                 adapter = new MeasuresAdapter(sortMeasures(measures));
                 recyclerView.setAdapter(adapter);
@@ -158,9 +163,24 @@ public class MeasuresFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
-        if((requestCode == REQUEST_EDIT_MEASURE || requestCode == REQUEST_ADD_MEASURE) && resultCode == getActivity().RESULT_OK){
+        if(resultCode == getActivity().RESULT_OK){
 
-            getMeasures();
+            Measure newMeasure = (Measure) data.getSerializableExtra(KEY_NEW_MEASURE);
+            if(requestCode == REQUEST_ADD_MEASURE){
+
+                this.measures.add(newMeasure);
+            }else if(requestCode == REQUEST_EDIT_MEASURE){
+
+                for(int i = 0; i < this.measures.size(); i++){
+
+                    if(this.measures.get(i).getId().equals(newMeasure.getId())){
+
+                        this.measures.remove(i);
+                        this.measures.add(newMeasure);
+                    }
+                }
+            }
+            this.adapter.notifyDataSetChanged();
         }
     }
 
