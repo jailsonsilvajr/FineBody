@@ -5,21 +5,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Measure;
-import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelEditMeasure;
 
 public class EditMeasureActivity extends AppCompatActivity {
+
+    private final String KEY_NEW_MEASURE = "com.jjsj.finebodyapp.new_measure";
 
     private Measure measure;
     private TextInputLayout textInputLayout_date;
@@ -81,8 +82,30 @@ public class EditMeasureActivity extends AppCompatActivity {
             }
         });
         this.progressBar = findViewById(R.id.layout_edit_measures_progressBar);
-        this.progressBar.setVisibility(View.GONE);
+
         this.viewModelEditMeasure = new ViewModelProvider(this).get(ViewModelEditMeasure.class);
+        this.viewModelEditMeasure.observerMeasure().observe(this, new Observer<Measure>() {
+            @Override
+            public void onChanged(Measure newMeasure) {
+
+                if(newMeasure != null) {
+
+                    Intent intent = new Intent();
+                    intent.putExtra(KEY_NEW_MEASURE, newMeasure);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+                else{
+
+                    progressBar.setVisibility(View.GONE);
+                    button_save.setVisibility(View.VISIBLE);
+                    new MaterialAlertDialogBuilder(EditMeasureActivity.this)
+                            .setTitle(getResources().getString(R.string.TitleAlertEditMeasureFail))
+                            .setMessage(getResources().getString(R.string.MessageAlertEditMeasureFail))
+                            .show();
+                }
+            }
+        });
     }
 
     private void saveMeasure(){
@@ -104,22 +127,6 @@ public class EditMeasureActivity extends AppCompatActivity {
         newMeasure.setLeftCalf(Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString()));
 
         this.viewModelEditMeasure.editMeasure(newMeasure);
-        this.viewModelEditMeasure.observerResponseMeasure().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(Response res) {
-
-                if(res.getStatus() == 200) {
-
-                    setResult(RESULT_OK);
-                    finish();
-                }
-                else{
-
-                    progressBar.setVisibility(View.GONE);
-                    button_save.setVisibility(View.VISIBLE);
-                }
-            }
-        });
     }
 
     @Override

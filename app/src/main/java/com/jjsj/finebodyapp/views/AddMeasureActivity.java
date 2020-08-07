@@ -81,6 +81,8 @@ public class AddMeasureActivity extends AppCompatActivity {
                     finish();
                 }else{
 
+                    button_save.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                     new MaterialAlertDialogBuilder(AddMeasureActivity.this)
                             .setTitle(getResources().getString(R.string.TitleAlertAddMeasureFail))
                             .setMessage(getResources().getString(R.string.MessageAlertAddMeasureFail))
