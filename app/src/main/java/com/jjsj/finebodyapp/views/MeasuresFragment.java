@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -60,6 +61,9 @@ public class MeasuresFragment extends Fragment {
 
         Bundle extras = getActivity().getIntent().getExtras();
         this.student = (Student) extras.getSerializable("student");
+
+        this.viewModelMeasures = new ViewModelProvider(this).get(ViewModelMeasures.class);
+        this.viewModelMeasures.setIdStudent(this.student.getId());
 
         View view = inflater.inflate(R.layout.fragment_measures, container, false);
         this.progressBar = view.findViewById(R.id.layout_measures_progressBar);
@@ -108,8 +112,14 @@ public class MeasuresFragment extends Fragment {
             }
         });
 
-        this.viewModelMeasures = new ViewModelProvider(this).get(ViewModelMeasures.class);
-        this.viewModelMeasures.setIdStudent(this.student.getId());
+        setObservers();
+        getMeasures();
+
+        return view;
+    }
+
+    private void setObservers(){
+
         this.viewModelMeasures.observerMeasures().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
             @Override
             public void onChanged(List<Measure> newMeasures) {
@@ -120,15 +130,25 @@ public class MeasuresFragment extends Fragment {
                 recyclerView.setAdapter(adapter);
             }
         });
-        getMeasures();
 
-        return view;
+        this.viewModelMeasures.observerDeleteMeasure().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+
+                if(aBoolean){
+
+                    progressBar.setVisibility(View.GONE);
+                    getMeasures();
+                    Toast.makeText(getContext(), R.string.ToastDeleteMeasureSuccess, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
 
     private void getMeasures(){
 
         this.progressBar.setVisibility(View.VISIBLE);
-        this.viewModelMeasures.getMeasures();
+        this.viewModelMeasures.getAllMeasures();
     }
 
     private List<Measure> sortMeasures(List<Measure> measures){
@@ -163,24 +183,14 @@ public class MeasuresFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == getActivity().RESULT_OK){
+        if(requestCode == REQUEST_ADD_MEASURE && resultCode == getActivity().RESULT_OK){
 
             Measure newMeasure = (Measure) data.getSerializableExtra(KEY_NEW_MEASURE);
-            if(requestCode == REQUEST_ADD_MEASURE){
-
-                this.measures.add(newMeasure);
-            }else if(requestCode == REQUEST_EDIT_MEASURE){
-
-                for(int i = 0; i < this.measures.size(); i++){
-
-                    if(this.measures.get(i).getId().equals(newMeasure.getId())){
-
-                        this.measures.remove(i);
-                        this.measures.add(newMeasure);
-                    }
-                }
-            }
+            this.measures.add(newMeasure);
             this.adapter.notifyDataSetChanged();
+        }else if(requestCode == REQUEST_EDIT_MEASURE && resultCode == getActivity().RESULT_OK){
+
+            getMeasures();
         }
     }
 

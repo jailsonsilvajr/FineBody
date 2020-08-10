@@ -1,62 +1,40 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-import com.jjsj.finebodyapp.database.entitys.Measure;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 
-import java.util.List;
+public class ViewModelStudent extends ViewModel {
 
-public class ViewModelStudent extends AndroidViewModel {
+    public MutableLiveData<Boolean> deleteStudent;
+    public MutableLiveData<Boolean> deleteMeasures;
 
-    private Repository repository;
-    private LiveData<Response> responseGetMeasures;
-    private LiveData<Response> responseDeleteStudent;
-    private LiveData<Response> responseDeleteMeasures;
+    public LiveData<Boolean> observerDeleteStudent(){
 
-    public ViewModelStudent(@NonNull Application application) {
-
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
+        if(this.deleteStudent == null) this.deleteStudent = new MutableLiveData<>();
+        return this.deleteStudent;
     }
 
-    public LiveData<Response> observerResponseGetMeasures() {
+    public LiveData<Boolean> observerDeleteMeasures(){
 
-        return this.responseGetMeasures;
-    }
-
-    public LiveData<Response> observerResponseDeleteStudent(){
-
-        return this.responseDeleteStudent;
-    }
-
-    public LiveData<Response> observerResponseDeleteMeasures() {
-
-        return this.responseDeleteMeasures;
-    }
-
-    public void getMeasures(String idStudent){
-
-        this.responseGetMeasures = this.repository.getMeasures(idStudent);
+        if(this.deleteMeasures == null) this.deleteMeasures = new MutableLiveData<>();
+        return this.deleteMeasures;
     }
 
     public void deleteStudent(String idStudent){
 
-        this.responseDeleteStudent = this.repository.deleteStudent(idStudent);
+        Repository.getInstance().deleteOneStudent(idStudent, this.deleteStudent);
     }
 
-    public void deleteMeasures(List<Measure> measures){
+    public void deleteMeasures(String idStudent){
 
-        this.responseDeleteMeasures = this.repository.deleteAllMeasures(measures);
+        Repository.getInstance().deleteAllMeasure(idStudent, this.deleteMeasures);
     }
 
     public void deleteImg(String path){
 
-        this.repository.deleteImg(path);
+        Repository.getInstance().deleteImg(path);
     }
 }

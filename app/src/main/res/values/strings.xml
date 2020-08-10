@@ -27,6 +27,7 @@
     <string name="MessageAlertAddMeasureFail">Tente novamente!</string>
     <string name="TitleAlertEditMeasureFail">Falha ao editar medidas.</string>
     <string name="MessageAlertEditMeasureFail">Tente novamente!</string>
+    <string name="ToastDeleteMeasureSuccess">A medida foi deletada.</string>
     <string name="logout">SAIR</string>
     <string name="students">Alunos</string>
     <string name="new_datas">Novos Dados</string>

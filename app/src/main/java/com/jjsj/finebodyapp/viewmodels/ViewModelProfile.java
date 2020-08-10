@@ -1,45 +1,25 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 
 import java.io.IOException;
 
-public class ViewModelProfile extends AndroidViewModel {
+public class ViewModelProfile extends ViewModel {
 
-    private Repository repository;
-    private LiveData<byte[]> imgProfileBytes;
-    private LiveData<Response> responseStudent;
-
-    public ViewModelProfile(@NonNull Application application) {
-
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
-    }
+    private MutableLiveData<byte[]> imgProfileBytes;
 
     public LiveData<byte[]> observerImgProfileBytes(){
 
+        if(this.imgProfileBytes == null) this.imgProfileBytes = new MutableLiveData<>();
         return this.imgProfileBytes;
-    }
-
-    public LiveData<Response> observerResponseStudent(){
-
-        return this.responseStudent;
     }
 
     public void downloadImgProfile(String path) throws IOException {
 
-        this.imgProfileBytes = this.repository.downloadPhoto(path);
-    }
-
-    public void getStudent(String idStudent){
-
-        this.responseStudent = this.repository.getStudent(idStudent);
+        Repository.getInstance().downloadPhoto(path, imgProfileBytes);
     }
 }

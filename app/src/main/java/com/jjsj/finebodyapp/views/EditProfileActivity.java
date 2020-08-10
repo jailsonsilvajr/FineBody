@@ -22,7 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelEditStudent;
 
 import java.io.IOException;
@@ -71,7 +70,6 @@ public class EditProfileActivity extends AppCompatActivity {
         });
         try {
 
-            this.viewModelEditStudent.downloadImage(student.getPathPhoto());
             this.viewModelEditStudent.observerDownloadImage().observe(this, new Observer<byte[]>() {
                 @Override
                 public void onChanged(byte[] bytes) {
@@ -89,6 +87,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     }
                 }
             });
+            this.viewModelEditStudent.downloadImage(student.getPathPhoto());
         } catch (IOException e) {
 
             e.printStackTrace();
@@ -157,7 +156,6 @@ public class EditProfileActivity extends AppCompatActivity {
         getProgressBar().setVisibility(View.VISIBLE);
         getButtonSave().setVisibility(View.GONE);
 
-        getViewModelEditStudent().doUpload(getImageViewProfile(), getStudent().getPathPhoto());
         getViewModelEditStudent().observerUploadImage().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
@@ -177,27 +175,28 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
         });
+        getViewModelEditStudent().doUpload(getImageViewProfile(), getStudent().getPathPhoto());
     }
 
     private void updateStudent(){
 
-        Student newStudent = new Student();
-        newStudent.setId(getStudent().getId());
-        newStudent.setIdCoach(getStudent().getIdCoach());
-        newStudent.setName(getTextInputLayoutName().getEditText().getText().toString());
-        newStudent.setGenre(getSpinnerGenre().getSelectedItem().toString());
-        newStudent.setAge(Integer.parseInt(getSpinnerAge().getSelectedItem().toString()));
-        newStudent.setPathPhoto(getStudent().getPathPhoto());
 
-        getViewModelEditStudent().updateStudent(newStudent);
-        getViewModelEditStudent().observerResponseUpdateStudent().observe(this, new Observer<Response>() {
+        Student newStudent = new Student(
+                getStudent().getId(),
+                getTextInputLayoutName().getEditText().getText().toString(),
+                getSpinnerGenre().getSelectedItem().toString(),
+                Integer.parseInt(getSpinnerAge().getSelectedItem().toString()),
+                getStudent().getIdCoach(),
+                getStudent().getPathPhoto()
+        );
+
+        getViewModelEditStudent().observerUpdateStudent().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(Response response) {
+            public void onChanged(Boolean aBoolean) {
 
-                if(response.getStatus() == 200){
+                if(aBoolean){
 
                     setStudent(newStudent);
-
                     Intent returnIntent = new Intent();
                     returnIntent.putExtra("student", getStudent());
                     setResult(RESULT_OK, returnIntent);
@@ -214,7 +213,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             }
         });
-
+        getViewModelEditStudent().updateStudent(newStudent);
     }
 
     public Student getStudent() {
@@ -295,10 +294,5 @@ public class EditProfileActivity extends AppCompatActivity {
     public void setViewModelEditStudent() {
 
         this.viewModelEditStudent = new ViewModelProvider(this).get(ViewModelEditStudent.class);
-    }
-
-    public static int getRequestImageCapture() {
-
-        return REQUEST_IMAGE_CAPTURE;
     }
 }

@@ -18,9 +18,9 @@ import android.widget.Spinner;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
+
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.viewmodels.ViewModelAddStudent;
 
@@ -51,6 +51,49 @@ public class AddStudentActivity extends AppCompatActivity {
 
         setViews();
         setViewModelAddStudent();
+        getViewModelAddStudent().observerIdStudent().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+
+                if(s != null){
+
+                    student.setId(s);
+                    getViewModelAddStudent().updateStudent(student);
+                }else{
+
+                    new MaterialAlertDialogBuilder(AddStudentActivity.this)
+                            .setTitle(getResources().getString(R.string.TitleAlertAddStudentFail))
+                            .setMessage(getResources().getString(R.string.MessageAlertAddStudentFail))
+                            .show();
+                    showView(false, getProgressBar());
+                    showView(true, getButtonSave());
+                }
+            }
+        });
+
+        getViewModelAddStudent().observerUpdateStudent().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+
+                if(aBoolean){
+
+                    getViewModelAddStudent().doUploadPhoto(getCircleImageView(), student.getPathPhoto());
+                }
+            }
+        });
+
+        getViewModelAddStudent().observerUploadPhoto().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+
+                if(aBoolean){
+
+                    setResult(RESULT_OK);
+                    finish();
+                }
+            }
+        });
+
         getCircleImageView().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,65 +121,15 @@ public class AddStudentActivity extends AppCompatActivity {
         showView(true, getProgressBar());
 
         PreferenceLogged preferenceLogged = new PreferenceLogged(this);
-        Student newStudent = new Student();
-        newStudent.setIdCoach(preferenceLogged.getPreference());
-        newStudent.setName(getTextInputLayoutName().getEditText().getText().toString());
-        newStudent.setGenre(getSpinnerGenre().getSelectedItem().toString());
-        newStudent.setAge(Integer.parseInt(getSpinnerAge().getSelectedItem().toString()));
-        newStudent.setPathPhoto("images/");
-        getViewModelAddStudent().addStudent(newStudent);
-        getViewModelAddStudent().observerResponseAddStudent().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(Response response) {
-
-                if(response.getStatus() == 201){
-
-                    setStudent((Student) response.getObject());
-                    updateStudent(getStudent());
-                }else{
-
-                    new MaterialAlertDialogBuilder(AddStudentActivity.this)
-                            .setTitle(getResources().getString(R.string.TitleAlertAddStudentFail))
-                            .setMessage(getResources().getString(R.string.MessageAlertAddStudentFail))
-                            .show();
-                    showView(false, getProgressBar());
-                    showView(true, getButtonSave());
-                }
-            }
-        });
-    }
-
-    private void updateStudent(Student student){
-
-        getViewModelAddStudent().updateStudent(student);
-        getViewModelAddStudent().observerResponseUpdateStudent().observe(this, new Observer<Response>() {
-            @Override
-            public void onChanged(Response response) {
-
-                if(response.getStatus() == 200){
-
-                    uploadPhoto(getStudent().getPathPhoto());
-                }else{
-
-
-                }
-            }
-        });
-    }
-
-    private void uploadPhoto(String path){
-
-        getViewModelAddStudent().doUpload(getCircleImageView(), path);
-        getViewModelAddStudent().observerResponseUploadPhoto().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-
-                Intent intent = new Intent();
-                intent.putExtra("student", getStudent());
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-        });
+        this.student = new Student(
+                null,
+                getTextInputLayoutName().getEditText().getText().toString(),
+                getSpinnerGenre().getSelectedItem().toString(),
+                Integer.parseInt(getSpinnerAge().getSelectedItem().toString()),
+                preferenceLogged.getPreference(),
+                "images/"
+        );
+        getViewModelAddStudent().addStudent(this.student);
     }
 
     private void takePicture(){

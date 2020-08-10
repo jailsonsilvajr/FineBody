@@ -1,6 +1,10 @@
 package com.jjsj.finebodyapp.database.entitys;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Measure implements Serializable {
 
@@ -26,6 +30,50 @@ public class Measure implements Serializable {
     public static final String nameFieldHip = "hip";
     public static final String nameFieldRightCalf = "rightCalf";
     public static final String nameFieldLeftCalf = "leftCalf";
+
+    public Measure(String id, String idStudent, String date, float weight, float rightArm, float leftArm, float waist, float hip, float rightCalf, float leftCalf) {
+        this.id = id;
+        this.idStudent = idStudent;
+        this.date = date;
+        this.weight = weight;
+        this.rightArm = rightArm;
+        this.leftArm = leftArm;
+        this.waist = waist;
+        this.hip = hip;
+        this.rightCalf = rightCalf;
+        this.leftCalf = leftCalf;
+    }
+
+    public Measure(DocumentSnapshot documentSnapshot){
+
+        this.id = documentSnapshot.getId();
+        this.idStudent = documentSnapshot.get(nameFieldIdStudent).toString();
+        this.date = documentSnapshot.get(nameFieldDate).toString();
+        this.weight = Float.parseFloat(documentSnapshot.get(nameFieldWeight).toString());
+        this.rightArm = Float.parseFloat(documentSnapshot.get(nameFieldRightArm).toString());
+        this.leftArm = Float.parseFloat(documentSnapshot.get(nameFieldLeftArm).toString());
+        this.waist = Float.parseFloat(documentSnapshot.get(nameFieldWaist).toString());
+        this.hip = Float.parseFloat(documentSnapshot.get(nameFieldHip).toString());
+        this.rightCalf = Float.parseFloat(documentSnapshot.get(nameFieldRightCalf).toString());
+        this.leftCalf = Float.parseFloat(documentSnapshot.get(nameFieldLeftCalf).toString());
+    }
+
+    public Map<String, Object> getMapMeasure(){
+
+        Map<String, Object> data = new HashMap<>();
+        if(this.id != null) data.put(Measure.nameFieldId, this.id);
+        data.put(Measure.nameFieldIdStudent, this.idStudent);
+        data.put(Measure.nameFieldDate, this.date);
+        data.put(Measure.nameFieldWeight, this.weight);
+        data.put(Measure.nameFieldRightArm, this.rightArm);
+        data.put(Measure.nameFieldLeftArm, this.leftArm);
+        data.put(Measure.nameFieldWaist, this.waist);
+        data.put(Measure.nameFieldHip, this.hip);
+        data.put(Measure.nameFieldRightCalf, this.rightCalf);
+        data.put(Measure.nameFieldLeftCalf, this.leftCalf);
+
+        return data;
+    }
 
     public String getId() {
         return id;

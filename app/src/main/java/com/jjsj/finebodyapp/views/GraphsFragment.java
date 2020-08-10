@@ -1,7 +1,6 @@
 package com.jjsj.finebodyapp.views;
 
 import android.annotation.SuppressLint;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -18,12 +17,11 @@ import android.widget.ProgressBar;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.viewmodels.ViewModelGraph;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -38,7 +36,7 @@ public class GraphsFragment extends Fragment {
     private ProgressBar progressBar;
     private WebView webView;
 
-    private List<Measure> measures;
+    private List<Measure> listMeasures;
 
     public GraphsFragment() {}
 
@@ -50,34 +48,12 @@ public class GraphsFragment extends Fragment {
         this.student = (Student) extra.getSerializable("student");
 
         this.viewModelGraph = new ViewModelProvider(this).get(ViewModelGraph.class);
-
-        View view = inflater.inflate(R.layout.fragment_graphs, container, false);
-
-        this.progressBar = view.findViewById(R.id.fragment_graph_progressBar);
-        this.webView = view.findViewById(R.id.webView);
-
-        this.webView.addJavascriptInterface(new WebAppInterface(), "Android");
-
-        this.webView.getSettings().setJavaScriptEnabled(true);
-
-        return view;
-    }
-
-    @Override
-    public void onResume() {
-
-        super.onResume();
-
-        this.webView.setVisibility(View.GONE);
-        this.progressBar.setVisibility(View.VISIBLE);
-        this.viewModelGraph.getMeasures(this.student.getId());
-        this.viewModelGraph.observerResponseMeasures().observe(getViewLifecycleOwner(), new Observer<Response>() {
+        this.viewModelGraph.observerListMeasure().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
             @Override
-            public void onChanged(Response response) {
+            public void onChanged(List<Measure> measures) {
 
-                if(response.getStatus() == 200){
+                if(measures != null){
 
-                    measures = (ArrayList) response.getObject();
                     Collections.sort(measures, new Comparator<Measure>() {
                         @Override
                         public int compare(Measure measure, Measure t1) {
@@ -94,6 +70,7 @@ public class GraphsFragment extends Fragment {
                             return 0;
                         }
                     });
+                    listMeasures = measures;
                     webView.loadUrl("file:///android_asset/webView.html");
 
                     webView.setVisibility(View.VISIBLE);
@@ -101,6 +78,25 @@ public class GraphsFragment extends Fragment {
                 }
             }
         });
+
+        View view = inflater.inflate(R.layout.fragment_graphs, container, false);
+        this.progressBar = view.findViewById(R.id.fragment_graph_progressBar);
+        this.webView = view.findViewById(R.id.webView);
+
+        this.webView.addJavascriptInterface(new WebAppInterface(), "Android");
+        this.webView.getSettings().setJavaScriptEnabled(true);
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+
+        this.webView.setVisibility(View.GONE);
+        this.progressBar.setVisibility(View.VISIBLE);
+        this.viewModelGraph.getListMeasure(this.student.getId());
     }
 
     public class WebAppInterface{
@@ -108,55 +104,55 @@ public class GraphsFragment extends Fragment {
         @JavascriptInterface
         public int getSizeMeasures(){
 
-            return measures.size();
+            return listMeasures.size();
         }
 
         @JavascriptInterface
         public String getDate(int i){
 
-            return measures.get(i).getDate();
+            return listMeasures.get(i).getDate();
         }
 
         @JavascriptInterface
         public float getWeight(int i){
 
-            return measures.get(i).getWeight();
+            return listMeasures.get(i).getWeight();
         }
 
         @JavascriptInterface
         public float getRightArm(int i){
 
-            return measures.get(i).getRightArm();
+            return listMeasures.get(i).getRightArm();
         }
 
         @JavascriptInterface
         public float getLeftArm(int i){
 
-            return measures.get(i).getLeftArm();
+            return listMeasures.get(i).getLeftArm();
         }
 
         @JavascriptInterface
         public float getWaist(int i){
 
-            return measures.get(i).getWaist();
+            return listMeasures.get(i).getWaist();
         }
 
         @JavascriptInterface
         public float getHip(int i){
 
-            return measures.get(i).getHip();
+            return listMeasures.get(i).getHip();
         }
 
         @JavascriptInterface
         public float getRightCalf(int i){
 
-            return measures.get(i).getRightCalf();
+            return listMeasures.get(i).getRightCalf();
         }
 
         @JavascriptInterface
         public float getLeftCalf(int i){
 
-            return measures.get(i).getLeftCalf();
+            return listMeasures.get(i).getLeftCalf();
         }
     }
 }

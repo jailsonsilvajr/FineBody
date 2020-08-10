@@ -36,6 +36,7 @@ public class AddMeasureActivity extends AppCompatActivity {
     private ProgressBar progressBar;
 
     private ViewModelAddMeasure viewModelAddMeasures;
+    private Measure measure;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,14 +70,15 @@ public class AddMeasureActivity extends AppCompatActivity {
         this.progressBar = findViewById(R.id.layout_add_measures_progressBar);
 
         this.viewModelAddMeasures = new ViewModelProvider(this).get(ViewModelAddMeasure.class);
-        this.viewModelAddMeasures.observerMeasure().observe(this, new Observer<Measure>() {
+        this.viewModelAddMeasures.observerIdMeasure().observe(this, new Observer<String>() {
             @Override
-            public void onChanged(Measure newMeasure) {
+            public void onChanged(String idMeasure) {
 
-                if(newMeasure != null){
+                if(idMeasure != null){
 
+                    measure.setId(idMeasure);
                     Intent intent = new Intent();
-                    intent.putExtra(KEY_NEW_MEASURE, newMeasure);
+                    intent.putExtra(KEY_NEW_MEASURE, measure);
                     setResult(RESULT_OK, intent);
                     finish();
                 }else{
@@ -97,18 +99,18 @@ public class AddMeasureActivity extends AppCompatActivity {
         this.button_save.setVisibility(View.GONE);
         this.progressBar.setVisibility(View.VISIBLE);
 
-        Measure measure = new Measure();
-        measure.setId("");
-        measure.setIdStudent(this.student.getId());
-        measure.setDate(this.textInputLayout_date.getEditText().getText().toString());
-        measure.setWeight(Float.parseFloat(this.textInputLayout_weight.getEditText().getText().toString()));
-        measure.setRightArm(Float.parseFloat(this.textInputLayout_right_arm.getEditText().getText().toString()));
-        measure.setLeftArm(Float.parseFloat(this.textInputLayout_left_arm.getEditText().getText().toString()));
-        measure.setWaist(Float.parseFloat(this.textInputLayout_waist.getEditText().getText().toString()));
-        measure.setHip(Float.parseFloat(this.textInputLayout_hip.getEditText().getText().toString()));
-        measure.setRightCalf(Float.parseFloat(this.textInputLayout_right_calf.getEditText().getText().toString()));
-        measure.setLeftCalf(Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString()));
-
+        this.measure = new Measure(
+                null,
+                this.student.getId(),
+                this.textInputLayout_date.getEditText().getText().toString(),
+                Float.parseFloat(this.textInputLayout_weight.getEditText().getText().toString()),
+                Float.parseFloat(this.textInputLayout_right_arm.getEditText().getText().toString()),
+                Float.parseFloat(this.textInputLayout_left_arm.getEditText().getText().toString()),
+                Float.parseFloat(this.textInputLayout_waist.getEditText().getText().toString()),
+                Float.parseFloat(this.textInputLayout_hip.getEditText().getText().toString()),
+                Float.parseFloat(this.textInputLayout_right_calf.getEditText().getText().toString()),
+                Float.parseFloat(this.textInputLayout_left_calf.getEditText().getText().toString())
+        );
         this.viewModelAddMeasures.addMeasure(measure);
     }
 

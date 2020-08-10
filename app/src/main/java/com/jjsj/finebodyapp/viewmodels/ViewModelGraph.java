@@ -1,35 +1,26 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
-
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.jjsj.finebodyapp.database.entitys.Measure;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 
 import java.util.List;
 
-public class ViewModelGraph extends AndroidViewModel {
+public class ViewModelGraph extends ViewModel {
 
-    private LiveData<Response> responseMeasure;
-    private Repository repository;
+    public MutableLiveData<List<Measure>> listMeasure;
 
-    public ViewModelGraph(@NonNull Application application) {
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
+    public LiveData<List<Measure>> observerListMeasure(){
+
+        if(this.listMeasure == null) this.listMeasure = new MutableLiveData<>();
+        return this.listMeasure;
     }
 
-    public LiveData<Response> observerResponseMeasures(){
+    public void getListMeasure(String idStudent){
 
-        return this.responseMeasure;
-    }
-
-    public void getMeasures(String idStudent){
-
-        this.responseMeasure = this.repository.getMeasures(idStudent);
+        Repository.getInstance().getAllMeasure(idStudent, this.listMeasure);
     }
 }

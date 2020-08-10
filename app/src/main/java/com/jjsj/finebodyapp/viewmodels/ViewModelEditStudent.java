@@ -1,58 +1,52 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 
 import java.io.IOException;
 
-public class ViewModelEditStudent extends AndroidViewModel {
+public class ViewModelEditStudent extends ViewModel {
 
-    private Repository repository;
-    private LiveData<Boolean> uploadImage;
-    private LiveData<byte[]> downloadImage;
-    private LiveData<Response> responseUpdateStudent;
+    private MutableLiveData<Boolean> uploadImage;
+    private MutableLiveData<byte[]> downloadImage;
+    private MutableLiveData<Boolean> updateStudent;
 
-    public ViewModelEditStudent(@NonNull Application application) {
+    public LiveData<Boolean> observerUpdateStudent(){
 
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
-    }
-
-    public LiveData<Boolean> observerUploadImage(){
-
-        return this.uploadImage;
-    }
-
-    public LiveData<byte[]> observerDownloadImage(){
-
-        return this.downloadImage;
-    }
-
-    public LiveData<Response> observerResponseUpdateStudent(){
-
-        return this.responseUpdateStudent;
-    }
-
-    public void doUpload(ImageView imageView, String path){
-
-        this.uploadImage = this.repository.uploadPhoto(imageView, path);
+        if(this.updateStudent == null) this.updateStudent = new MutableLiveData<>();
+        return this.updateStudent;
     }
 
     public void updateStudent(Student student){
 
-        this.responseUpdateStudent = this.repository.updateStudent(student);
+        Repository.getInstance().putOneStudent(student, this.updateStudent);
+    }
+
+    public LiveData<Boolean> observerUploadImage(){
+
+        if(this.uploadImage == null) this.uploadImage = new MutableLiveData<>();
+        return this.uploadImage;
+    }
+
+    public void doUpload(ImageView imageView, String path){
+
+        Repository.getInstance().uploadPhoto(imageView, path, this.uploadImage);
+    }
+
+    public LiveData<byte[]> observerDownloadImage(){
+
+        if(this.downloadImage == null) this.downloadImage = new MutableLiveData<>();
+        return this.downloadImage;
     }
 
     public void downloadImage(String path) throws IOException {
 
-        this.downloadImage = this.repository.downloadPhoto(path);
+        Repository.getInstance().downloadPhoto(path, this.downloadImage);
     }
 }

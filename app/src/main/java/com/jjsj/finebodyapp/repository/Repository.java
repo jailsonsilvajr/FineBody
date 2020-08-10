@@ -1,6 +1,5 @@
 package com.jjsj.finebodyapp.repository;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageView;
@@ -15,8 +14,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.database.entitys.Student;
 import com.jjsj.finebodyapp.database.firebase.FireRequests;
-import com.jjsj.finebodyapp.database.firebase.Response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -25,76 +24,78 @@ import java.util.List;
 public class Repository {
 
     private static Repository repository;
+    private static FireRequests fireRequests;
 
     private Repository(){}
 
-    public static Repository getInstance(Context context){
+    public static Repository getInstance(){
 
         if(repository == null){
 
             repository = new Repository();
+            fireRequests = new FireRequests();
         }
         return repository;
     }
 
-    public MutableLiveData<Response> getStudent(String idStudent){
+    public void getAllStudent(String idCoach, MutableLiveData<List<Student>> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
+        fireRequests.getAllStudent(idCoach, mutableLiveData);
+    }
+
+    public MutableLiveData<Student> getOneStudent(String idStudent){
+
         return fireRequests.getOneStudent(idStudent);
     }
 
-    public MutableLiveData<Response> insertStudent(com.jjsj.finebodyapp.database.entitys.Student student){
+    public void postOneStudent(Student student, MutableLiveData<String> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.postOneStudent(student);
+        fireRequests.postOneStudent(student, mutableLiveData);
     }
 
-    public MutableLiveData<Response> deleteStudent(String idStudent){
+    public void deleteOneStudent(String idStudent, MutableLiveData<Boolean> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.deleteOneStudent(idStudent);
+        fireRequests.deleteOneStudent(idStudent, mutableLiveData);
     }
 
-    public MutableLiveData<Response> updateStudent(com.jjsj.finebodyapp.database.entitys.Student student){
+    public void putOneStudent(Student student, MutableLiveData<Boolean> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.putOneStudent(student);
+        fireRequests.putOneStudent(student, mutableLiveData);
     }
 
-    public MutableLiveData<Response> getMeasures(String idStudent){
+    public void getAllMeasure(String idStudent, MutableLiveData<List<Measure>> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.getAllMeasure(idStudent);
+        fireRequests.getAllMeasure(idStudent, mutableLiveData);
     }
 
-    public MutableLiveData<Response> insertMeasure(com.jjsj.finebodyapp.database.entitys.Measure measure){
+    public MutableLiveData<Measure> getOneMeasure(String idMeasure){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.postOneMeasure(measure);
+        return fireRequests.getOneMeasure(idMeasure);
     }
 
-    public MutableLiveData<Response> deleteMeasure(String idMeasure){
+    public void postOneMeasure(Measure measure, MutableLiveData<String> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.deleteOneMeasure(idMeasure);
+        fireRequests.postOneMeasure(measure, mutableLiveData);
     }
 
-    public MutableLiveData<Response> deleteAllMeasures(List<Measure> measures){
+    public void deleteOneMeasure(String idMeasure, MutableLiveData<Boolean> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.deleteAllMeasure(measures);
+        fireRequests.deleteOneMeasure(idMeasure, mutableLiveData);
     }
 
-    public MutableLiveData<Response> updateMeasure(com.jjsj.finebodyapp.database.entitys.Measure measure){
+    public void deleteAllMeasure(String idStudent, MutableLiveData<Boolean> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.putOneMeasure(measure);
+        fireRequests.deleteAllMeasure(idStudent, mutableLiveData);
     }
 
-    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
+    public void putOneMeasure(Measure measure, MutableLiveData<Boolean> mutableLiveData){
 
-        FireRequests fireRequests = new FireRequests();
-        return fireRequests.downloadPhoto(path);
+        fireRequests.putOneMeasure(measure, mutableLiveData);
+    }
+
+    public void downloadPhoto(String path, MutableLiveData<byte[]> mutableLiveData) throws IOException {
+
+        fireRequests.downloadPhoto(path, mutableLiveData);
     }
 
     public void deleteImg(String path){
@@ -103,9 +104,7 @@ public class Repository {
         fireRequests.deleteImg(path);
     }
 
-    public MutableLiveData<Boolean> uploadPhoto(ImageView imageView, String path){
-
-        MutableLiveData<Boolean> result = new MutableLiveData<>();
+    public void uploadPhoto(ImageView imageView, String path, MutableLiveData<Boolean> mutableLiveData){
 
         FirebaseStorage storage = FirebaseStorage.getInstance();
         StorageReference storageReference = storage.getReference();
@@ -123,16 +122,14 @@ public class Repository {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                result.setValue(true);
+                mutableLiveData.setValue(true);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                result.setValue(false);
+                mutableLiveData.setValue(false);
             }
         });
-
-        return result;
     }
 }

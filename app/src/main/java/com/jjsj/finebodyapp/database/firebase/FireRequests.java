@@ -3,16 +3,11 @@ package com.jjsj.finebodyapp.database.firebase;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import com.google.firebase.storage.FirebaseStorage;
@@ -21,125 +16,97 @@ import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.entitys.Student;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FireRequests {
 
-    public MutableLiveData<Response> getOneStudent(String idStudent){
+    //STUDENT:
+    public MutableLiveData<Student> getOneStudent(String idStudent){
 
-        MutableLiveData<Response> response = new MutableLiveData<>();
+        MutableLiveData<Student> studentMutableLiveData = new MutableLiveData<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Student.nameCollection)
                 .document(idStudent)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
 
-                        if(task.isSuccessful()){
+                        //Create Student:
+                        Student student = new Student(documentSnapshot);
+                        //return student
+                        studentMutableLiveData.setValue(student);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-                            DocumentSnapshot document = task.getResult();
-                            if(document.exists()){
-
-                                //Create student
-                                Student student = new Student();
-                                student.setId(document.getId());
-                                student.setName(document.get(Student.nameFieldName).toString());
-                                student.setGenre(document.get(Student.nameFieldGenre).toString());
-                                student.setAge(Integer.parseInt(document.get(Student.nameFieldAge).toString()));
-                                student.setIdCoach(document.get(Student.nameFieldIdCoach).toString());
-                                student.setPathPhoto(document.get(Student.nameFieldPathPhoto).toString());
-
-                                Response res = new Response(302, "Found", student);
-                                response.setValue(res);
-                            }else{
-
-                                Response res = new Response(404, "Not Found", null);
-                                response.setValue(res);
-                            }
-                        }else{
-
-                            Response res = new Response(500, "Internal Server Error", null);
-                            response.setValue(res);
-                        }
+                        //return null
+                        studentMutableLiveData.setValue(null);
                     }
                 });
-        return response;
+        return studentMutableLiveData;
     }
 
-    public MutableLiveData<Response> getAllStudent(String idCoach){
+    public void getAllStudent(String idCoach, MutableLiveData<List<Student>> mutableLiveData){
 
-        MutableLiveData<Response> result = new MutableLiveData<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Student.nameCollection)
                 .whereEqualTo(Student.nameFieldIdCoach, idCoach)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        if(task.isSuccessful()){
+                        List<Student> listStudent = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
 
-                            List<Student> listStudents = new ArrayList<>();
-                            for(QueryDocumentSnapshot document : task.getResult()){
-
-                                //Create student
-                                Student student = new Student();
-                                student.setId(document.getId());
-                                student.setName(document.get(Student.nameFieldName).toString());
-                                student.setGenre(document.get(Student.nameFieldGenre).toString());
-                                student.setAge(Integer.parseInt(document.get(Student.nameFieldAge).toString()));
-                                student.setIdCoach(document.get(Student.nameFieldIdCoach).toString());
-                                student.setPathPhoto(document.get(Student.nameFieldPathPhoto).toString());
-
-                                listStudents.add(student);
-                            }
-                            Response response = new Response(302, "Found", listStudents);
-                            result.setValue(response);
-                        }else{
-
-                            Response response = new Response(404, "Error: " + task.getException(), null);
+                            //Create Student
+                            Student student = new Student(documentSnapshot);
+                            //add in list
+                            listStudent.add(student);
                         }
+                        //return list
+                        mutableLiveData.setValue(listStudent);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        //return null
+                        mutableLiveData.setValue(null);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> postOneStudent(Student student){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
+    public void postOneStudent(Student student, MutableLiveData<String> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Student.nameCollection)
-                .add(getMapStudent(student))
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                .add(student.getMapStudent())
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                    public void onSuccess(DocumentReference documentReference) {
 
-                        if(task.isSuccessful()){
+                        //return id
+                        mutableLiveData.setValue(documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-                            student.setId(task.getResult().getId());
-                            student.setPathPhoto(student.getPathPhoto() + student.getId());
-                            Response response = new Response(201, "Created", student);
-                            result.setValue(response);
-                        }else{
-
-                            Response response = new Response(500, task.getException().toString(), null);
-                            result.setValue(response);
-                        }
+                        //return null
+                        mutableLiveData.setValue(null);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> deleteOneStudent(String idStudent){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
+    public void deleteOneStudent(String idStudent, MutableLiveData<Boolean> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Student.nameCollection)
@@ -149,124 +116,124 @@ public class FireRequests {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        Response response = new Response(200, "OK", null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Response response = new Response(404, e.getMessage(), null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(false);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> putOneStudent(Student student){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
+    public void putOneStudent(Student student, MutableLiveData<Boolean> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Student.nameCollection)
                 .document(student.getId())
-                .set(getMapStudent(student))
+                .set(student.getMapStudent())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        Response response = new Response(200, "OK", null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Response response = new Response(404, e.getMessage(), null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(false);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> getAllMeasure(String idStudent){
+    //MEASURE:
+    public MutableLiveData<Measure> getOneMeasure(String idMeasure){
 
-        MutableLiveData<Response> result = new MutableLiveData<>();
+        MutableLiveData<Measure> measureMutableLiveData = new MutableLiveData<>();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Measure.nameCollection)
+                .document(idMeasure)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+
+                        //Create Measure:
+                        Measure measure = new Measure(documentSnapshot);
+                        //return Measure
+                        measureMutableLiveData.setValue(measure);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        //return null
+                        measureMutableLiveData.setValue(null);
+                    }
+                });
+        return measureMutableLiveData;
+    }
+
+    public void getAllMeasure(String idStudent, MutableLiveData<List<Measure>> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Measure.nameCollection)
                 .whereEqualTo(Measure.nameFieldIdStudent, idStudent)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        if(task.isSuccessful()){
+                        List<Measure> listMeasure = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
 
-                            List<Measure> listMeasure = new ArrayList<>();
-                            for(QueryDocumentSnapshot document : task.getResult()){
-
-                                Measure measure = new Measure();
-                                measure.setId(document.getId());
-                                measure.setIdStudent(document.get(Measure.nameFieldIdStudent).toString());
-                                measure.setDate(document.get(Measure.nameFieldDate).toString());
-                                measure.setWeight(Float.parseFloat(document.get(Measure.nameFieldWeight).toString()));
-                                measure.setRightArm(Float.parseFloat(document.get(Measure.nameFieldRightArm).toString()));
-                                measure.setLeftArm(Float.parseFloat(document.get(Measure.nameFieldLeftArm).toString()));
-                                measure.setWaist(Float.parseFloat(document.get(Measure.nameFieldWaist).toString()));
-                                measure.setHip(Float.parseFloat(document.get(Measure.nameFieldHip).toString()));
-                                measure.setRightCalf(Float.parseFloat(document.get(Measure.nameFieldRightCalf).toString()));
-                                measure.setLeftCalf(Float.parseFloat(document.get(Measure.nameFieldLeftCalf).toString()));
-
-                                listMeasure.add(measure);
-                            }
-                            Response response = new Response(200, "OK", listMeasure);
-                            result.setValue(response);
-                        }else{
-
-                            Response response = new Response(404, task.getException().getMessage(), null);
-                            result.setValue(response);
+                            //Create Measure
+                            Measure measure = new Measure(documentSnapshot);
+                            //add in list
+                            listMeasure.add(measure);
                         }
+                        mutableLiveData.setValue(listMeasure);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        //return null
+                        mutableLiveData.setValue(null);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> postOneMeasure(Measure measure){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
+    public void postOneMeasure(Measure measure, MutableLiveData<String> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Measure.nameCollection)
-                .add(getMapMeasure(measure))
-                .addOnCompleteListener(new OnCompleteListener<DocumentReference>() {
+                .add(measure.getMapMeasure())
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
-                    public void onComplete(@NonNull Task<DocumentReference> task) {
+                    public void onSuccess(DocumentReference documentReference) {
 
-                        if(task.isSuccessful()){
+                        //return idMeasure
+                        mutableLiveData.setValue(documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-                            measure.setId(task.getResult().getId());
-                            Response response = new Response(200, "OK", measure);
-                            result.setValue(response);
-                        }else{
-
-                            Response response = new Response(500, task.getException().getMessage(), null);
-                            result.setValue(response);
-                        }
+                        //return null
+                        mutableLiveData.setValue(null);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> deleteOneMeasure(String idMeasure){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
+    public void deleteOneMeasure(String idMeasure, MutableLiveData<Boolean> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Measure.nameCollection)
@@ -276,65 +243,60 @@ public class FireRequests {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        Response response = new Response(200, "OK", null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Response response = new Response(404, e.getMessage(), null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(false);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<Response> deleteAllMeasure(List<Measure> measures){
+    public void deleteAllMeasure(String idStudent, MutableLiveData<Boolean> mutableLiveData){
 
-        MutableLiveData<Response> result = new MutableLiveData<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        for(int i = 0; i < measures.size(); i++){
+        db.collection(Measure.nameCollection)
+                .whereEqualTo(Measure.nameFieldIdStudent, idStudent)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-            db.collection(Measure.nameCollection).document(measures.get(i).getId()).delete();
-        }
-        result.setValue(new Response(200, null, null));
-        return result;
+                        for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
+
+                            documentSnapshot.getReference().delete();
+                        }
+                        mutableLiveData.setValue(true);
+                    }
+                });
     }
 
-    public MutableLiveData<Response> putOneMeasure(Measure measure){
-
-        MutableLiveData<Response> result = new MutableLiveData<>();
+    public void putOneMeasure(Measure measure, MutableLiveData<Boolean> mutableLiveData){
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection(Measure.nameCollection)
                 .document(measure.getId())
-                .set(getMapMeasure(measure))
+                .set(measure.getMapMeasure())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        Response response = new Response(200, "OK", null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 
-                        Response response = new Response(404, e.getMessage(), null);
-                        result.setValue(response);
+                        mutableLiveData.setValue(false);
                     }
                 });
-
-        return result;
     }
 
-    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
-
-        MutableLiveData<byte[]> imgBytes = new MutableLiveData<>();
+    public void downloadPhoto(String path, MutableLiveData<byte[]> mutableLiveData) throws IOException {
 
         FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
         StorageReference storageReference = firebaseStorage.getReference();
@@ -345,17 +307,15 @@ public class FireRequests {
             @Override
             public void onSuccess(byte[] bytes) {
 
-                imgBytes.setValue(bytes);
+                mutableLiveData.setValue(bytes);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
 
-                imgBytes.setValue(null);
+                mutableLiveData.setValue(null);
             }
         });
-
-        return imgBytes;
     }
 
     public void deleteImg(String path){
@@ -364,36 +324,5 @@ public class FireRequests {
         StorageReference storageReference = firebaseStorage.getReference();
         StorageReference imgReference = storageReference.child(path);
         imgReference.delete();
-    }
-
-    private Map<String, Object> getMapStudent(Student student){
-
-        Map<String, Object> data = new HashMap<>();
-        if(student.getId() != null) data.put(Student.nameFieldId, student.getId());
-        data.put(Student.nameFieldName, student.getName());
-        data.put(Student.nameFieldGenre, student.getGenre());
-        data.put(Student.nameFieldAge, student.getAge());
-        data.put(Student.nameFieldIdCoach, student.getIdCoach());
-        data.put(Student.nameFieldPathPhoto, student.getPathPhoto());
-
-        return data;
-    }
-
-    private Map<String, Object> getMapMeasure(Measure measure){
-
-        Map<String, Object> data = new HashMap<>();
-
-        if(measure.getId() != null) data.put(Measure.nameFieldId, measure.getId());
-        data.put(Measure.nameFieldIdStudent, measure.getIdStudent());
-        data.put(Measure.nameFieldDate, measure.getDate());
-        data.put(Measure.nameFieldWeight, measure.getWeight());
-        data.put(Measure.nameFieldRightArm, measure.getRightArm());
-        data.put(Measure.nameFieldLeftArm, measure.getLeftArm());
-        data.put(Measure.nameFieldWaist, measure.getWaist());
-        data.put(Measure.nameFieldHip, measure.getHip());
-        data.put(Measure.nameFieldRightCalf, measure.getRightCalf());
-        data.put(Measure.nameFieldLeftCalf, measure.getLeftCalf());
-
-        return data;
     }
 }

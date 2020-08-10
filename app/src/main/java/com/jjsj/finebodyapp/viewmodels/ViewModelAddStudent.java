@@ -1,56 +1,50 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.app.Application;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
 
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.repository.Repository;
 
-public class ViewModelAddStudent extends AndroidViewModel {
+public class ViewModelAddStudent extends ViewModel {
 
-    public LiveData<Response> responseAddStudent;
-    public LiveData<Response> responseUpdateStudent;
-    public LiveData<Boolean> responseUploadPhoto;
-    private Repository repository;
+    private MutableLiveData<String> idStudent;
+    private MutableLiveData<Boolean> updateStudent;
+    private MutableLiveData<Boolean> uploadPhoto;
 
-    public ViewModelAddStudent(@NonNull Application application) {
+    public LiveData<String> observerIdStudent(){
 
-        super(application);
-        this.repository = Repository.getInstance(application.getApplicationContext());
+        if(idStudent == null) this.idStudent = new MutableLiveData<>();
+        return this.idStudent;
     }
 
-    public LiveData<Response> observerResponseAddStudent(){
+    public LiveData<Boolean> observerUpdateStudent(){
 
-        return this.responseAddStudent;
+        if(updateStudent == null) this.updateStudent = new MutableLiveData<>();
+        return this.updateStudent;
     }
 
-    public LiveData<Response> observerResponseUpdateStudent(){
+    public  LiveData<Boolean> observerUploadPhoto(){
 
-        return this.responseUpdateStudent;
-    }
-
-    public LiveData<Boolean> observerResponseUploadPhoto(){
-
-        return this.responseUploadPhoto;
+        if(uploadPhoto == null) this.uploadPhoto = new MutableLiveData<>();
+        return this. uploadPhoto;
     }
 
     public void addStudent(Student newStudent){
 
-        this.responseAddStudent = this.repository.insertStudent(newStudent);
+        Repository.getInstance().postOneStudent(newStudent, this.idStudent);
     }
 
     public void updateStudent(Student student){
 
-        this.responseUpdateStudent = this.repository.updateStudent(student);
+        Repository.getInstance().putOneStudent(student, this.updateStudent);
     }
 
-    public void doUpload(ImageView imageView, String path){
+    public void doUploadPhoto(ImageView imageView, String path){
 
-        this.responseUploadPhoto = this.repository.uploadPhoto(imageView, path);
+        Repository.getInstance().uploadPhoto(imageView, path, this.uploadPhoto);
     }
 }

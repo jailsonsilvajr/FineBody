@@ -19,12 +19,10 @@ import android.widget.ProgressBar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.viewmodels.ViewModelStudents;
 import com.jjsj.finebodyapp.views.adapter.StudentsAdapter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StudentsActivity extends AppCompatActivity {
@@ -46,14 +44,17 @@ public class StudentsActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(getResources().getString(R.string.students));
 
-        this.progressBar = findViewById(R.id.layout_students_progressBar);
-        this.progressBar.setVisibility(View.VISIBLE);
+        this.viewModelStudents = new ViewModelProvider(this).get(ViewModelStudents.class);
+        setObserverListStudent();
+        getListStudent();
 
+        this.progressBar = findViewById(R.id.layout_students_progressBar);
         this.recyclerView = findViewById(R.id.layout_students_recyclerView);
-        this.recyclerView.setVisibility(View.GONE);
         this.recyclerView.setHasFixedSize(true);
         this.layoutManager = new LinearLayoutManager(this);
         this.recyclerView.setLayoutManager(this.layoutManager);
+
+        setVisibilityProgressBar(View.VISIBLE);
 
         this.floatingActionButton = findViewById(R.id.layout_students_floatingActionButton);
         this.floatingActionButton.setOnClickListener(new View.OnClickListener() {
@@ -63,27 +64,30 @@ public class StudentsActivity extends AppCompatActivity {
                 openActivityAddStudent();
             }
         });
+    }
 
-        this.viewModelStudents = new ViewModelProvider(this).get(ViewModelStudents.class);
-        this.viewModelStudents.getMutableLiveDataResponse().observe(this, new Observer<Response>() {
+    private void getListStudent(){
+
+        this.viewModelStudents.getListStudent(new PreferenceLogged(this).getPreference());
+    }
+
+    private void setObserverListStudent(){
+
+        this.viewModelStudents.observerListStudent().observe(this, new Observer<List<Student>>() {
             @Override
-            public void onChanged(Response response) {
+            public void onChanged(List<Student> listStudent) {
 
-                progressBar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                setVisibilityProgressBar(View.GONE);
 
-                if(response.getStatus() == 302){
+                if(listStudent != null){
 
-                    List<Student> students = (ArrayList) response.getObject();
-                    adapter = new StudentsAdapter(students, viewModelStudents, StudentsActivity.this, REQUEST_ACTIVITY_STUDENT);
-                    recyclerView.setAdapter(adapter);
+                    insertItemInRecycler(listStudent);
                 }else{
 
-
+                    //?????????????????????????????????????
                 }
             }
         });
-        this.viewModelStudents.getStudents(new PreferenceLogged(this).getPreference());
     }
 
     private void openActivityAddStudent(){
@@ -92,13 +96,25 @@ public class StudentsActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_ACTIVITY_ADD_STUDENT);
     }
 
+    private void setVisibilityProgressBar(int visibility){
+
+        this.progressBar.setVisibility(visibility);
+        this.recyclerView.setVisibility(visibility == View.VISIBLE ? View.GONE : View.VISIBLE);
+    }
+
+    private void insertItemInRecycler(List<Student> listStudent){
+
+        this.adapter = new StudentsAdapter(listStudent, this.viewModelStudents, this, REQUEST_ACTIVITY_STUDENT);
+        this.recyclerView.setAdapter(this.adapter);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
         if((requestCode == REQUEST_ACTIVITY_ADD_STUDENT || requestCode == REQUEST_ACTIVITY_STUDENT) && resultCode == RESULT_OK){
 
-            this.viewModelStudents.getStudents(new PreferenceLogged(this).getPreference());
+            getListStudent();
         }
     }
 
