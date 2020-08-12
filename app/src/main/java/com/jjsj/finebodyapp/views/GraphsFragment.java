@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.utils.KeyName;
 import com.jjsj.finebodyapp.viewmodels.ViewModelGraph;
 
 import java.text.ParseException;
@@ -45,7 +46,7 @@ public class GraphsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         Bundle extra = getActivity().getIntent().getExtras();
-        this.student = (Student) extra.getSerializable("student");
+        this.student = (Student) extra.getSerializable(KeyName.KEY_NAME_STUDENT);
 
         this.viewModelGraph = new ViewModelProvider(this).get(ViewModelGraph.class);
         this.viewModelGraph.observerListMeasure().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {

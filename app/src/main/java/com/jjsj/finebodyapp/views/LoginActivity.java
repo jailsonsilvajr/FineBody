@@ -11,10 +11,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-
 import com.google.android.material.textfield.TextInputEditText;
+
 import com.jjsj.finebodyapp.R;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.viewmodels.ViewModelLogin;
 
@@ -59,19 +58,19 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         this.viewModelLogin = new ViewModelProvider(this).get(ViewModelLogin.class);
-        this.viewModelLogin.getLiveDataResponseLogin().observe(this, new Observer<Response>() {
+        this.viewModelLogin.observerIdCoach().observe(this, new Observer<String>() {
             @Override
-            public void onChanged(Response response) {
+            public void onChanged(String idCoach) {
 
                 progressBar.setVisibility(View.GONE);
-                if(response.getStatus() != 200){
+                if(idCoach == null){
 
                     new MaterialAlertDialogBuilder(LoginActivity.this)
                             .setTitle(getResources().getString(R.string.TitleAlertLoginFail))
                             .setMessage(getResources().getString(R.string.MessageAlertLoginFail))
                             .show();
                 }else{
-                    insertIdCoachInPreferences(String.class.cast(response.getObject()));
+                    insertIdCoachInPreferences(idCoach);
                     openActivityStudents();
                 }
             }

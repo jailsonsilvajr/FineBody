@@ -8,28 +8,6 @@
     android:background="#FFFFFF"
     tools:context=".views.EditProfileActivity">
 
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/layout_edit_profile_imageView"
-        android:layout_width="125dp"
-        android:layout_height="125dp"
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/upload"/>
-
-    <!--<ImageView
-        android:id="@+id/layout_edit_profile_imageView"
-        android:layout_width="125dp"
-        android:layout_height="125dp"
-        android:layout_marginTop="32dp"
-        android:clickable="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/upload" />-->
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/layout_edit_profile_textInput_name"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
@@ -42,7 +20,7 @@
         app:boxStrokeColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layout_edit_profile_imageView">
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -87,17 +65,18 @@
         android:textColor="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layout_edit_profile_spinner_age" />
 
     <ProgressBar
         android:id="@+id/layout_edit_profile_progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/layout_edit_profile_button_save"
+        app:layout_constraintBottom_toBottomOf="@+id/layout_edit_profile_button_save"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/layout_edit_profile_button_save" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

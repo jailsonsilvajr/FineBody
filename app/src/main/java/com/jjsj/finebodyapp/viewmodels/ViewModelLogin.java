@@ -9,16 +9,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.jjsj.finebodyapp.database.firebase.Response;
 
 public class ViewModelLogin extends ViewModel {
 
-    private MutableLiveData<Response> mutableLiveDataResponseLogin;
+    private MutableLiveData<String> idCoach;
 
-    public LiveData<Response> getLiveDataResponseLogin(){
+    public LiveData<String> observerIdCoach(){
 
-        if(this.mutableLiveDataResponseLogin == null) this.mutableLiveDataResponseLogin = new MutableLiveData<Response>();
-        return this.mutableLiveDataResponseLogin;
+        if(this.idCoach == null) this.idCoach = new MutableLiveData<>();
+        return this.idCoach;
     }
 
     public void doLogin(String email, String password){
@@ -30,10 +29,10 @@ public class ViewModelLogin extends ViewModel {
 
                         if(task.isSuccessful()){
 
-                            mutableLiveDataResponseLogin.setValue(new Response(200, "OK", task.getResult().getUser().getUid()));
+                            idCoach.setValue(task.getResult().getUser().getUid());
                         }else{
 
-                            mutableLiveDataResponseLogin.setValue(new Response(401, task.getException().toString(), null));
+                            idCoach.setValue(null);
                         }
                     }
                 });

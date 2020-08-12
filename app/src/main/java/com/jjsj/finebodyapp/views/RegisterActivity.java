@@ -14,7 +14,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 
 import com.jjsj.finebodyapp.R;
-import com.jjsj.finebodyapp.database.firebase.Response;
 import com.jjsj.finebodyapp.preferences.PreferenceLogged;
 import com.jjsj.finebodyapp.viewmodels.ViewModelRegister;
 
@@ -50,12 +49,12 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         this.viewModelRegister = new ViewModelProvider(this).get(ViewModelRegister.class);
-        this.viewModelRegister.getLiveDataResponseRegister().observe(this, new Observer<Response>() {
+        this.viewModelRegister.observerIdCoach().observe(this, new Observer<String>() {
             @Override
-            public void onChanged(Response response) {
+            public void onChanged(String idCoach) {
 
                 progressBar.setVisibility(View.GONE);
-                if(response.getStatus() != 200){
+                if(idCoach == null){
 
                     new MaterialAlertDialogBuilder(RegisterActivity.this)
                             .setTitle(getResources().getString(R.string.TitleAlertRegisterFail))
@@ -63,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity {
                             .show();
                 }else{
 
-                    insertIdCoachInPreferences(String.class.cast(response.getObject()));
+                    insertIdCoachInPreferences(idCoach);
                     openActivityStudents();
                     finish();
                 }

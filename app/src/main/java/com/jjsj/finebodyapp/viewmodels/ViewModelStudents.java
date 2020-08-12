@@ -1,69 +1,69 @@
 package com.jjsj.finebodyapp.viewmodels;
 
+import android.app.Application;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.repository.Repository;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
-import java.io.IOException;
+import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.preferences.PreferenceLogged;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class ViewModelStudents extends ViewModel {
+public class ViewModelStudents extends AndroidViewModel {
 
-    private MutableLiveData<List<Student>> listStudentMutableLiveData;
-    private LiveData<byte[]> liveDataImageProfile;
+    private MutableLiveData<List<Student>> listStudent;
+    private String idCoach;
+
+    public ViewModelStudents(Application application){
+        super(application);
+        this.idCoach = new PreferenceLogged(application.getApplicationContext()).getPreference();
+    }
 
     public LiveData<List<Student>> observerListStudent(){
 
-        if(this.listStudentMutableLiveData == null) this.listStudentMutableLiveData = new MutableLiveData<>();
-        return this.listStudentMutableLiveData;
+        if(this.listStudent == null) this.listStudent = new MutableLiveData<>();
+        return this.listStudent;
     }
 
-    public void getListStudent(String idCoach){
+    public void getListStudent(){
 
-        Repository.getInstance().getAllStudent(idCoach, this.listStudentMutableLiveData);
-    }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Student.nameCollection)
+                .whereEqualTo(Student.nameFieldIdCoach, this.idCoach)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-    public LiveData<byte[]> getLiveDataImageProfile(){
+                        List<Student> students = new ArrayList<>();
+                        for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
 
-        return this.liveDataImageProfile;
-    }
+                            //Create Student
+                            Student student = new Student(documentSnapshot);
+                            //add in list
+                            students.add(student);
+                        }
+                        //return list
+                        listStudent.setValue(students);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-    public void getImageProfile(String path) throws IOException {
-
-        this.liveDataImageProfile = downloadPhoto(path);
-    }
-
-    public MutableLiveData<byte[]> downloadPhoto(String path) throws IOException {
-
-        MutableLiveData<byte[]> imgBytes = new MutableLiveData<>();
-
-        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
-        StorageReference storageReference = firebaseStorage.getReference();
-        StorageReference imgReference = storageReference.child(path);
-
-        final long ONE_MEGABYTE = 1024 * 1024;
-        imgReference.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-
-                imgBytes.setValue(bytes);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-
-                imgBytes.setValue(null);
-            }
-        });
-
-        return imgBytes;
+                        //return null
+                        listStudent.setValue(null);
+                    }
+                });
     }
 }

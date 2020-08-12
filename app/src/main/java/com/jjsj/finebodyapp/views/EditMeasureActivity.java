@@ -16,6 +16,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.utils.KeyName;
+import com.jjsj.finebodyapp.utils.ResultCode;
 import com.jjsj.finebodyapp.viewmodels.ViewModelEditMeasure;
 
 public class EditMeasureActivity extends AppCompatActivity {
@@ -47,7 +49,7 @@ public class EditMeasureActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         Bundle extras = getIntent().getExtras();
-        this.measure = (Measure) extras.getSerializable("measure");
+        this.measure = (Measure) extras.getSerializable(KeyName.KEY_NAME_MEASURE);
 
         this.textInputLayout_date = findViewById(R.id.layout_edit_measures_textInput_date);
         this.textInputLayout_date.getEditText().setText(this.measure.getDate());
@@ -90,7 +92,9 @@ public class EditMeasureActivity extends AppCompatActivity {
 
                 if(aBoolean) {
 
-                    setResult(RESULT_OK);
+                    Intent intent = new Intent();
+                    intent.putExtra(KeyName.KEY_NAME_MEASURE, measure);
+                    setResult(ResultCode.RESULT_CODE_MEASURE_UPDATED, intent);
                     finish();
                 }
                 else{

@@ -1,50 +1,55 @@
 package com.jjsj.finebodyapp.viewmodels;
 
-import android.widget.ImageView;
-
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import com.jjsj.finebodyapp.database.entitys.Student;
-import com.jjsj.finebodyapp.repository.Repository;
 
 public class ViewModelAddStudent extends ViewModel {
 
     private MutableLiveData<String> idStudent;
-    private MutableLiveData<Boolean> updateStudent;
-    private MutableLiveData<Boolean> uploadPhoto;
 
     public LiveData<String> observerIdStudent(){
 
-        if(idStudent == null) this.idStudent = new MutableLiveData<>();
+        if(this.idStudent == null) this.idStudent = new MutableLiveData<>();
         return this.idStudent;
     }
 
-    public LiveData<Boolean> observerUpdateStudent(){
+    public void addStudent(Student student){
 
-        if(updateStudent == null) this.updateStudent = new MutableLiveData<>();
-        return this.updateStudent;
-    }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Student.nameCollection)
+                .add(student.getMapStudent())
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
 
-    public  LiveData<Boolean> observerUploadPhoto(){
+                        //return id
+                        String id = documentReference.getId();
+                        student.setId(id);
 
-        if(uploadPhoto == null) this.uploadPhoto = new MutableLiveData<>();
-        return this. uploadPhoto;
-    }
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection(Student.nameCollection)
+                                .document(student.getId())
+                                .set(student.getMapStudent());
 
-    public void addStudent(Student newStudent){
+                        idStudent.setValue(id);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-        Repository.getInstance().postOneStudent(newStudent, this.idStudent);
-    }
-
-    public void updateStudent(Student student){
-
-        Repository.getInstance().putOneStudent(student, this.updateStudent);
-    }
-
-    public void doUploadPhoto(ImageView imageView, String path){
-
-        Repository.getInstance().uploadPhoto(imageView, path, this.uploadPhoto);
+                        //return null
+                        idStudent.setValue(null);
+                    }
+                });
     }
 }

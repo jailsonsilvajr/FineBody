@@ -1,15 +1,21 @@
 package com.jjsj.finebodyapp.viewmodels;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.jjsj.finebodyapp.repository.Repository;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.jjsj.finebodyapp.database.entitys.Measure;
+import com.jjsj.finebodyapp.database.entitys.Student;
 
 public class ViewModelStudent extends ViewModel {
 
     public MutableLiveData<Boolean> deleteStudent;
-    public MutableLiveData<Boolean> deleteMeasures;
 
     public LiveData<Boolean> observerDeleteStudent(){
 
@@ -17,24 +23,39 @@ public class ViewModelStudent extends ViewModel {
         return this.deleteStudent;
     }
 
-    public LiveData<Boolean> observerDeleteMeasures(){
-
-        if(this.deleteMeasures == null) this.deleteMeasures = new MutableLiveData<>();
-        return this.deleteMeasures;
-    }
-
     public void deleteStudent(String idStudent){
 
-        Repository.getInstance().deleteOneStudent(idStudent, this.deleteStudent);
-    }
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Student.nameCollection)
+                .document(idStudent)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
 
-    public void deleteMeasures(String idStudent){
+                        deleteStudent.setValue(true);
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection(Measure.nameCollection)
+                                .whereEqualTo(Measure.nameFieldIdStudent, idStudent)
+                                .get()
+                                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-        Repository.getInstance().deleteAllMeasure(idStudent, this.deleteMeasures);
-    }
+                                        for(DocumentSnapshot documentSnapshot : queryDocumentSnapshots.getDocuments()){
 
-    public void deleteImg(String path){
+                                            documentSnapshot.getReference().delete();
+                                        }
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
 
-        Repository.getInstance().deleteImg(path);
+                        deleteStudent.setValue(false);
+                    }
+                });
     }
 }

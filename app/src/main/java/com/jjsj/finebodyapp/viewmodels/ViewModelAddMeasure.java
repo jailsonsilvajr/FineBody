@@ -1,11 +1,15 @@
 package com.jjsj.finebodyapp.viewmodels;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jjsj.finebodyapp.database.entitys.Measure;
-import com.jjsj.finebodyapp.repository.Repository;
 
 public class ViewModelAddMeasure extends ViewModel {
 
@@ -19,6 +23,24 @@ public class ViewModelAddMeasure extends ViewModel {
 
     public void addMeasure(Measure newMeasure){
 
-        Repository.getInstance().postOneMeasure(newMeasure, idMeasure);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection(Measure.nameCollection)
+                .add(newMeasure.getMapMeasure())
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+
+                        //return idMeasure
+                        idMeasure.setValue(documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        //return null
+                        idMeasure.setValue(null);
+                    }
+                });
     }
 }

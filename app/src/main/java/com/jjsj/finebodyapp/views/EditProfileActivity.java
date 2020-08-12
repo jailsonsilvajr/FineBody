@@ -1,20 +1,14 @@
 package com.jjsj.finebodyapp.views;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 
@@ -22,9 +16,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.utils.KeyName;
+import com.jjsj.finebodyapp.utils.ResultCode;
 import com.jjsj.finebodyapp.viewmodels.ViewModelEditStudent;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,15 +27,12 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private Student student;
 
-    private ImageView imageViewProfile;
     private TextInputLayout textInputLayoutName;
     private Spinner spinnerGenre;
     private Spinner spinnerAge;
     private Button buttonSave;
     private ProgressBar progressBar;
     private ViewModelEditStudent viewModelEditStudent;
-
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,156 +42,16 @@ public class EditProfileActivity extends AppCompatActivity {
 
         getSupportActionBar().setTitle(R.string.editProfile);
 
-        setViewModelEditStudent();
-
-        Bundle extra = getIntent().getExtras();
-        setStudent((Student) extra.getSerializable("student"));
-
-        setViewsEditProfile();
-    }
-
-    private void setViewsEditProfile(){
-
-        setImageViewProfile(findViewById(R.id.layout_edit_profile_imageView));
-        getImageViewProfile().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                takePicture();
-            }
-        });
-        try {
-
-            this.viewModelEditStudent.observerDownloadImage().observe(this, new Observer<byte[]>() {
-                @Override
-                public void onChanged(byte[] bytes) {
-
-                    if(bytes != null){
-
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        getImageViewProfile().setImageBitmap(bitmap);
-                    }else if(getStudent().getGenre().equals(getResources().getString(R.string.female))){
-
-                        getImageViewProfile().setImageResource(R.drawable.menina);
-                    }else{
-
-                        getImageViewProfile().setImageResource(R.drawable.boy);
-                    }
-                }
-            });
-            this.viewModelEditStudent.downloadImage(student.getPathPhoto());
-        } catch (IOException e) {
-
-            e.printStackTrace();
-        }
-
-        setTextInputLayoutName(findViewById(R.id.layout_edit_profile_textInput_name));
-        getTextInputLayoutName().getEditText().setText(getStudent().getName());
-
-        setSpinnerGenre(findViewById(R.id.layout_edit_profile_spinner_genre));
-        ArrayAdapter<CharSequence> adapterGenre = ArrayAdapter.createFromResource(this, R.array.genres, android.R.layout.simple_spinner_item);
-        adapterGenre.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        getSpinnerGenre().setAdapter(adapterGenre);
-        if(getStudent().getGenre().equals("Masculino")) getSpinnerGenre().setSelection(0);
-        else getSpinnerGenre().setSelection(1);
-
-        setSpinnerAge(findViewById(R.id.layout_edit_profile_spinner_age));
-        List<String> ages = new ArrayList<>();
-        for(int i = 1; i <= 100; i++) ages.add(Integer.toString(i));
-        ArrayAdapter<String> adapterAge = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, ages);
-        adapterAge.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        getSpinnerAge().setAdapter(adapterAge);
-        getSpinnerAge().setSelection(getStudent().getAge() - 1);
-
-        setButtonSave(findViewById(R.id.layout_edit_profile_button_save));
-        getButtonSave().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                uploadPhoto();
-            }
-        });
-
-        setProgressBar(findViewById(R.id.layout_edit_profile_progressBar));
-        getProgressBar().setVisibility(View.GONE);
-    }
-
-    private void takePicture(){
-
-        Intent intent = new Intent(Intent.ACTION_PICK);
-        intent.setType("image/*");
-        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK){
-
-            Uri photoUri = data.getData();
-            if(photoUri != null){
-
-                try {
-
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), photoUri);
-                    getImageViewProfile().setImageBitmap(bitmap);
-                }catch (Exception e){
-
-                    e.printStackTrace();
-                }
-            }
-        }else super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void uploadPhoto(){
-
-        getProgressBar().setVisibility(View.VISIBLE);
-        getButtonSave().setVisibility(View.GONE);
-
-        getViewModelEditStudent().observerUploadImage().observe(this, new Observer<Boolean>() {
+        this.viewModelEditStudent = new ViewModelProvider(this).get(ViewModelEditStudent.class);
+        this.viewModelEditStudent.observerStudentUpdated().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
 
                 if(aBoolean){
 
-                    updateStudent();
-                }else{
-
-                    new MaterialAlertDialogBuilder(EditProfileActivity.this)
-                            .setTitle(getResources().getString(R.string.error))
-                            .setMessage(getResources().getString(R.string.MessageAlertEditProfileFail))
-                            .show();
-
-                    getProgressBar().setVisibility(View.GONE);
-                    getButtonSave().setVisibility(View.VISIBLE);
-                }
-            }
-        });
-        getViewModelEditStudent().doUpload(getImageViewProfile(), getStudent().getPathPhoto());
-    }
-
-    private void updateStudent(){
-
-
-        Student newStudent = new Student(
-                getStudent().getId(),
-                getTextInputLayoutName().getEditText().getText().toString(),
-                getSpinnerGenre().getSelectedItem().toString(),
-                Integer.parseInt(getSpinnerAge().getSelectedItem().toString()),
-                getStudent().getIdCoach(),
-                getStudent().getPathPhoto()
-        );
-
-        getViewModelEditStudent().observerUpdateStudent().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-
-                if(aBoolean){
-
-                    setStudent(newStudent);
                     Intent returnIntent = new Intent();
-                    returnIntent.putExtra("student", getStudent());
-                    setResult(RESULT_OK, returnIntent);
+                    returnIntent.putExtra(KeyName.KEY_NAME_STUDENT, student);
+                    setResult(ResultCode.RESULT_CODE_STUDENT_UPDATED, returnIntent);
                     finish();
                 }else{
 
@@ -208,91 +60,60 @@ public class EditProfileActivity extends AppCompatActivity {
                             .setMessage(getResources().getString(R.string.MessageAlertEditProfileFail))
                             .show();
 
-                    getProgressBar().setVisibility(View.GONE);
-                    getButtonSave().setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                    buttonSave.setVisibility(View.VISIBLE);
                 }
             }
         });
-        getViewModelEditStudent().updateStudent(newStudent);
+
+        Bundle extra = getIntent().getExtras();
+        this.student = (Student) extra.getSerializable(KeyName.KEY_NAME_STUDENT);
+
+        setViewsEditProfile();
     }
 
-    public Student getStudent() {
+    private void setViewsEditProfile(){
 
-        return this.student;
+        this.textInputLayoutName = findViewById(R.id.layout_edit_profile_textInput_name);
+        this.textInputLayoutName.getEditText().setText(this.student.getName());
+
+        this.spinnerGenre = findViewById(R.id.layout_edit_profile_spinner_genre);
+        ArrayAdapter<CharSequence> adapterGenre = ArrayAdapter.createFromResource(this, R.array.genres, android.R.layout.simple_spinner_item);
+        adapterGenre.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.spinnerGenre.setAdapter(adapterGenre);
+        if(this.student.getGenre().equals("Masculino")) this.spinnerGenre.setSelection(0);
+        else this.spinnerGenre.setSelection(1);
+
+        this.spinnerAge = findViewById(R.id.layout_edit_profile_spinner_age);
+        List<String> ages = new ArrayList<>();
+        for(int i = 1; i <= 100; i++) ages.add(Integer.toString(i));
+        ArrayAdapter<String> adapterAge = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, ages);
+        adapterAge.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        this.spinnerAge.setAdapter(adapterAge);
+        this.spinnerAge.setSelection(this.student.getAge() - 1);
+
+        this.buttonSave = findViewById(R.id.layout_edit_profile_button_save);
+        this.buttonSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                updateStudent();
+            }
+        });
+
+        this.progressBar = findViewById(R.id.layout_edit_profile_progressBar);
+        this.progressBar.setVisibility(View.GONE);
     }
 
-    public void setStudent(Student student) {
+    private void updateStudent(){
 
-        this.student = student;
-    }
+        this.progressBar.setVisibility(View.VISIBLE);
+        this.buttonSave.setVisibility(View.GONE);
 
-    public ImageView getImageViewProfile() {
+        this.student.setName(this.textInputLayoutName.getEditText().getText().toString());
+        this.student.setGenre(this.spinnerGenre.getSelectedItem().toString());
+        this.student.setAge(Integer.parseInt(this.spinnerAge.getSelectedItem().toString()));
 
-        return this.imageViewProfile;
-    }
-
-    public void setImageViewProfile(ImageView imageViewProfile) {
-
-        this.imageViewProfile = imageViewProfile;
-    }
-
-    public TextInputLayout getTextInputLayoutName() {
-
-        return this.textInputLayoutName;
-    }
-
-    public void setTextInputLayoutName(TextInputLayout textInputLayoutName) {
-
-        this.textInputLayoutName = textInputLayoutName;
-    }
-
-    public Spinner getSpinnerGenre() {
-
-        return this.spinnerGenre;
-    }
-
-    public void setSpinnerGenre(Spinner spinnerGenre) {
-
-        this.spinnerGenre = spinnerGenre;
-    }
-
-    public Spinner getSpinnerAge() {
-
-        return spinnerAge;
-    }
-
-    public void setSpinnerAge(Spinner spinnerAge) {
-
-        this.spinnerAge = spinnerAge;
-    }
-
-    public Button getButtonSave() {
-
-        return this.buttonSave;
-    }
-
-    public void setButtonSave(Button buttonSave) {
-
-        this.buttonSave = buttonSave;
-    }
-
-    public ProgressBar getProgressBar() {
-
-        return this.progressBar;
-    }
-
-    public void setProgressBar(ProgressBar progressBar) {
-
-        this.progressBar = progressBar;
-    }
-
-    public ViewModelEditStudent getViewModelEditStudent() {
-
-        return this.viewModelEditStudent;
-    }
-
-    public void setViewModelEditStudent() {
-
-        this.viewModelEditStudent = new ViewModelProvider(this).get(ViewModelEditStudent.class);
+        this.viewModelEditStudent.updateStudent(this.student);
     }
 }

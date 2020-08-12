@@ -13,7 +13,6 @@ public class Student implements Serializable {
     private String genre;
     private int age;
     private String idCoach;
-    private String pathPhoto;
 
     public static final String nameCollection = "students";
     public static final String nameFieldId = "id";
@@ -21,15 +20,13 @@ public class Student implements Serializable {
     public static final String nameFieldGenre = "genre";
     public static final String nameFieldAge = "age";
     public static final String nameFieldIdCoach = "idCoach";
-    public static final String nameFieldPathPhoto = "pathPhoto";
 
-    public Student(String id, String name, String genre, int age, String idCoach, String pathPhoto) {
+    public Student(String id, String name, String genre, int age, String idCoach) {
         this.id = id;
         this.name = name;
         this.genre = genre;
         this.age = age;
         this.idCoach = idCoach;
-        this.pathPhoto = pathPhoto;
     }
 
     public Student(DocumentSnapshot document){
@@ -39,7 +36,6 @@ public class Student implements Serializable {
         this.genre = document.get(nameFieldGenre).toString();
         this.age = Integer.parseInt(document.get(nameFieldAge).toString());
         this.idCoach = document.get(nameFieldIdCoach).toString();
-        this.pathPhoto = document.get(nameFieldPathPhoto).toString();
     }
 
     public Map<String, Object> getMapStudent(){
@@ -50,7 +46,6 @@ public class Student implements Serializable {
         data.put(Student.nameFieldGenre, this.genre);
         data.put(Student.nameFieldAge, this.age);
         data.put(Student.nameFieldIdCoach, this.idCoach);
-        data.put(Student.nameFieldPathPhoto, this.pathPhoto);
 
         return data;
     }
@@ -93,13 +88,5 @@ public class Student implements Serializable {
 
     public void setIdCoach(String idCoach) {
         this.idCoach = idCoach;
-    }
-
-    public String getPathPhoto() {
-        return pathPhoto;
-    }
-
-    public void setPathPhoto(String pathPhoto) {
-        this.pathPhoto = pathPhoto;
     }
 }

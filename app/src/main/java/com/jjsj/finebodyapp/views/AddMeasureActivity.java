@@ -17,6 +17,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.jjsj.finebodyapp.R;
 import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.utils.KeyName;
+import com.jjsj.finebodyapp.utils.ResultCode;
 import com.jjsj.finebodyapp.viewmodels.ViewModelAddMeasure;
 
 public class AddMeasureActivity extends AppCompatActivity {
@@ -49,7 +51,7 @@ public class AddMeasureActivity extends AppCompatActivity {
         getSupportActionBar().setHomeButtonEnabled(true); //Activate button
 
         Bundle extras = getIntent().getExtras();
-        this.student = (Student) extras.getSerializable("student");
+        this.student = (Student) extras.getSerializable(KeyName.KEY_NAME_STUDENT_ID);
 
         this.textInputLayout_date = findViewById(R.id.layout_add_measures_textInput_date);
         this.textInputLayout_weight = findViewById(R.id.layout_add_measures_textInput_weight);
@@ -78,8 +80,8 @@ public class AddMeasureActivity extends AppCompatActivity {
 
                     measure.setId(idMeasure);
                     Intent intent = new Intent();
-                    intent.putExtra(KEY_NEW_MEASURE, measure);
-                    setResult(RESULT_OK, intent);
+                    intent.putExtra(KeyName.KEY_NAME_MEASURE, measure);
+                    setResult(ResultCode.RESULT_CODE_MEASURE_ADD, intent);
                     finish();
                 }else{
 

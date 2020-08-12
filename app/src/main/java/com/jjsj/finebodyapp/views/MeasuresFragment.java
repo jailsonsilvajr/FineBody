@@ -26,6 +26,9 @@ import com.jjsj.finebodyapp.R;
 
 import com.jjsj.finebodyapp.database.entitys.Measure;
 import com.jjsj.finebodyapp.database.entitys.Student;
+import com.jjsj.finebodyapp.utils.KeyName;
+import com.jjsj.finebodyapp.utils.RequestCode;
+import com.jjsj.finebodyapp.utils.ResultCode;
 import com.jjsj.finebodyapp.viewmodels.ViewModelMeasures;
 import com.jjsj.finebodyapp.views.adapter.MeasuresAdapter;
 
@@ -38,11 +41,6 @@ import java.util.List;
 
 public class MeasuresFragment extends Fragment {
 
-    private final String KEY_NEW_MEASURE = "com.jjsj.finebodyapp.new_measure";
-
-    private final int REQUEST_EDIT_MEASURE = 0;
-    private final int REQUEST_ADD_MEASURE = 1;
-
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
@@ -52,6 +50,7 @@ public class MeasuresFragment extends Fragment {
     private ViewModelMeasures viewModelMeasures;
 
     private List<Measure> measures;
+    private int position_last_delete;
 
     public MeasuresFragment() {}
 
@@ -60,10 +59,37 @@ public class MeasuresFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         Bundle extras = getActivity().getIntent().getExtras();
-        this.student = (Student) extras.getSerializable("student");
+        this.student = (Student) extras.getSerializable(KeyName.KEY_NAME_STUDENT);
 
         this.viewModelMeasures = new ViewModelProvider(this).get(ViewModelMeasures.class);
         this.viewModelMeasures.setIdStudent(this.student.getId());
+        this.viewModelMeasures.observerMeasures().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
+            @Override
+            public void onChanged(List<Measure> listMeasures) {
+
+                measures = listMeasures;
+                progressBar.setVisibility(View.GONE);
+                adapter = new MeasuresAdapter(sortMeasures(measures));
+                recyclerView.setAdapter(adapter);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        });
+        this.viewModelMeasures.observerDeleteMeasure().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+
+                if(aBoolean){
+
+                    measures.remove(position_last_delete);
+                    adapter.notifyDataSetChanged();
+                    Toast.makeText(getContext(), R.string.ToastDeleteMeasureSuccess, Toast.LENGTH_LONG).show();
+                }else{
+
+
+                }
+            }
+        });
+        this.viewModelMeasures.getAllMeasures();
 
         View view = inflater.inflate(R.layout.fragment_measures, container, false);
         this.progressBar = view.findViewById(R.id.layout_measures_progressBar);
@@ -76,8 +102,8 @@ public class MeasuresFragment extends Fragment {
             public void onClick(View view, int position) {
 
                 Intent intent = new Intent(getContext(), EditMeasureActivity.class);
-                intent.putExtra("measure", viewModelMeasures.getOneMeasure(position));
-                startActivityForResult(intent, REQUEST_EDIT_MEASURE);
+                intent.putExtra(KeyName.KEY_NAME_MEASURE, measures.get(position));
+                startActivityForResult(intent, RequestCode.REQUEST_CODE_EDIT_MEASURE);
             }
 
             @Override
@@ -89,8 +115,9 @@ public class MeasuresFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
 
+                                position_last_delete = position;
                                 view.findViewById(R.id.layout_measures_item_progressBar).setVisibility(View.VISIBLE);
-                                viewModelMeasures.deleteMeasure(viewModelMeasures.getOneMeasure(position).getId());
+                                viewModelMeasures.deleteMeasure(measures.get(position).getId());
                             }
                         })
                         .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -108,47 +135,11 @@ public class MeasuresFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                openAddMeasure(student);
+                openAddMeasure();
             }
         });
-
-        setObservers();
-        getMeasures();
 
         return view;
-    }
-
-    private void setObservers(){
-
-        this.viewModelMeasures.observerMeasures().observe(getViewLifecycleOwner(), new Observer<List<Measure>>() {
-            @Override
-            public void onChanged(List<Measure> newMeasures) {
-
-                measures = newMeasures;
-                progressBar.setVisibility(View.GONE);
-                adapter = new MeasuresAdapter(sortMeasures(measures));
-                recyclerView.setAdapter(adapter);
-            }
-        });
-
-        this.viewModelMeasures.observerDeleteMeasure().observe(getViewLifecycleOwner(), new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean aBoolean) {
-
-                if(aBoolean){
-
-                    progressBar.setVisibility(View.GONE);
-                    getMeasures();
-                    Toast.makeText(getContext(), R.string.ToastDeleteMeasureSuccess, Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-    }
-
-    private void getMeasures(){
-
-        this.progressBar.setVisibility(View.VISIBLE);
-        this.viewModelMeasures.getAllMeasures();
     }
 
     private List<Measure> sortMeasures(List<Measure> measures){
@@ -172,25 +163,34 @@ public class MeasuresFragment extends Fragment {
         return measures;
     }
 
-    private void openAddMeasure(Student student){
+    private void openAddMeasure(){
 
         Intent intent = new Intent(getContext(), AddMeasureActivity.class);
-        intent.putExtra("student", student);
-        startActivityForResult(intent, REQUEST_ADD_MEASURE);
+        intent.putExtra(KeyName.KEY_NAME_STUDENT_ID, this.student.getId());
+        startActivityForResult(intent, RequestCode.REQUEST_CODE_ADD_MEASURE);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_ADD_MEASURE && resultCode == getActivity().RESULT_OK){
+        if(requestCode == RequestCode.REQUEST_CODE_ADD_MEASURE && resultCode == ResultCode.RESULT_CODE_MEASURE_ADD){
 
-            Measure newMeasure = (Measure) data.getSerializableExtra(KEY_NEW_MEASURE);
+            Measure newMeasure = (Measure) data.getSerializableExtra(KeyName.KEY_NAME_MEASURE);
             this.measures.add(newMeasure);
             this.adapter.notifyDataSetChanged();
-        }else if(requestCode == REQUEST_EDIT_MEASURE && resultCode == getActivity().RESULT_OK){
+        }else if(requestCode == RequestCode.REQUEST_CODE_EDIT_MEASURE && resultCode == ResultCode.RESULT_CODE_MEASURE_UPDATED){
 
-            getMeasures();
+            Measure updatedMeasure = (Measure) data.getSerializableExtra(KeyName.KEY_NAME_MEASURE);
+            for(int i = 0; i < this.measures.size(); i++){
+
+                if(this.measures.get(i).getId().equals(updatedMeasure.getId())){
+
+                    this.measures.set(i, updatedMeasure);
+                    this.adapter.notifyDataSetChanged();
+                    break;
+                }
+            }
         }
     }
 
